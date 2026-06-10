@@ -46,6 +46,9 @@ Harness는 Claude Code 생태계의 **L3 Meta-Factory** 층 — 다른 하네스
 - **스킬 생성** — Progressive Disclosure 패턴으로 컨텍스트를 효율 관리하는 스킬 자동 생성
 - **오케스트레이션** — 에이전트 간 데이터 전달, 에러 핸들링, 팀 조율 프로토콜 포함
 - **검증 체계** — 트리거 검증, 드라이런 테스트, With-skill vs Without-skill 비교 테스트
+- **2층 품질 게이트** — 내부 생성-검증 QA **+** 외부 독립 리뷰 루프(`external-review-loop`): codex/gemini CLI가 단계 산출물을 리뷰하고, 오케스트레이터가 실코드 대조로 전건 판정(확인/부분/이월/기각) 후 확인분만 TDD로 수정. 도구 연동을 먼저 점검(`check-review-tools.sh`)해 codex/gemini가 없으면 스킬을 생성하지 않음.
+- **교리 주입** — 생성된 코드/수정 에이전트에 TDD(`tdd-doctrine.md`)·개발 규칙(`dev-rules.md`)을 실경로로 주입. 리스크 등급(경량/표준/중대)으로 게이트 강도 조절.
+- **듀얼 런타임 (Claude Code + Codex)** — 단일 출처(`skills/harness/`) + 런타임별 얇은 어댑터. 팩토리가 `CLAUDE.md`·`AGENTS.md` 포인터를 둘 다 출력하고 오케스트레이션을 분기(Claude `TeamCreate` ↔ Codex 네이티브 subagents / `codex exec`). 상세: `references/runtime-adapters.md`.
 
 ## 하네스 진화 메커니즘 (Harness Evolution Mechanism)
 
@@ -73,9 +76,11 @@ Phase 3: 에이전트 정의 생성 (.claude/agents/)
     ↓
 Phase 4: 스킬 생성 (.claude/skills/)
     ↓
-Phase 5: 통합 및 오케스트레이션
+Phase 5: 통합 및 오케스트레이션 (+ 2층 품질 게이트, 듀얼 런타임 출력)
     ↓
 Phase 6: 검증 및 테스트
+    ↓
+Phase 7: 하네스 진화 (피드백 → 지속 갱신)
 ```
 
 ## 설치
@@ -99,6 +104,19 @@ Phase 6: 검증 및 테스트
 cp -r skills/harness ~/.claude/skills/harness
 ```
 
+### Codex CLI (듀얼 런타임)
+
+Codex는 `~/.codex/skills/`(사용자 글로벌)에서 스킬을 발견하며, untrusted 프로젝트에서도 스킬은 로드됩니다. 레포의 `install.sh`가 라이브 팩토리를 심링크하고 리뷰 도구를 점검합니다:
+
+```shell
+bash install.sh
+# → ~/.codex/skills/harness → skills/harness (심링크, 항상 최신)
+# → repo .agents/skills/harness (trusted 프로젝트용)
+# → AGENTS.md (Codex 자동 로드)
+```
+
+Codex에서는 **`$harness`**, **`/skills`** 메뉴, 또는 description에 맞는 요청(예: "하네스 구성해줘")으로 호출합니다. `/harness`는 Codex 문법이 **아닙니다**(커스텀 슬래시 미지원). 설치 후 스킬 목록 재로딩을 위해 Codex 세션을 재시작하세요.
+
 ## 플러그인 구조
 
 ```
@@ -107,14 +125,22 @@ harness/
 │   └── plugin.json                 # 플러그인 매니페스트
 ├── skills/
 │   └── harness/
-│       ├── SKILL.md                # 메인 스킬 정의 (6 Phase 워크플로우)
-│       └── references/
-│           ├── agent-design-patterns.md   # 6가지 아키텍처 패턴
-│           ├── orchestrator-template.md   # 팀/서브에이전트 오케스트레이터 템플릿
-│           ├── team-examples.md           # 실전 팀 구성 예시 5종
-│           ├── skill-writing-guide.md     # 스킬 작성 가이드
-│           ├── skill-testing-guide.md     # 테스트/평가 방법론
-│           └── qa-agent-guide.md          # QA 에이전트 통합 가이드
+│       ├── SKILL.md                # 메인 스킬 정의 (7 Phase 워크플로우)
+│       ├── references/
+│       │   ├── agent-design-patterns.md   # 6가지 아키텍처 패턴
+│       │   ├── orchestrator-template.md   # 팀/서브/Codex 오케스트레이터 템플릿
+│       │   ├── team-examples.md           # 실전 팀 구성 예시
+│       │   ├── skill-writing-guide.md     # 스킬 작성 가이드
+│       │   ├── skill-testing-guide.md     # 테스트/평가 방법론
+│       │   ├── qa-agent-guide.md          # QA 에이전트 통합 가이드
+│       │   ├── external-review-loop.md    # codex/gemini 외부 리뷰 게이트 (방법론+템플릿)
+│       │   ├── tdd-doctrine.md            # TDD 교리 (코드 에이전트 주입용)
+│       │   ├── dev-rules.md               # 개발 규칙 (코드 에이전트 주입용)
+│       │   └── runtime-adapters.md        # Claude Code / Codex 듀얼 런타임 설계
+│       └── scripts/
+│           └── check-review-tools.sh      # codex/gemini 연동 점검
+├── AGENTS.md                       # Codex 런타임 진입점
+├── install.sh                      # 듀얼 런타임 설치 (Claude + Codex)
 └── README.md
 ```
 
