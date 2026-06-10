@@ -111,7 +111,7 @@ At this point you should have:
 
 **Next reads:**
 - [`docs/experimental-dependency.md`](./experimental-dependency.md) — Why the flag, and what we'll do when it changes
-- [`cookyman74/my_harness-100`](https://github.com/cookyman74/my_harness-100) — Catalog of 100+ pre-built domain harnesses, if you'd rather clone than generate
-- [`cookyman74/claude-code-harness`](https://github.com/cookyman74/claude-code-harness) — The A/B test harness we used to measure +60% quality on 15 tasks
+- [`revfactory/harness-100`](https://github.com/revfactory/harness-100) — Catalog of 100+ pre-built domain harnesses, if you'd rather clone than generate
+- [`revfactory/claude-code-harness`](https://github.com/revfactory/claude-code-harness) — The A/B test harness we used to measure +60% quality on 15 tasks
 
 **If you hit something this guide didn't cover:** open an issue with the `quickstart-gap` label and include: (a) which step failed, (b) `claude --version`, (c) the exact error message. The SLA for quickstart-gap issues is **48 hours** to first response (see `CONTRIBUTING.md`).
