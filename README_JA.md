@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
   <img src="https://img.shields.io/badge/Mode-Agent_Teams-green.svg" alt="Agent Teams">
-  <a href="https://github.com/revfactory/harness/stargazers"><img src="https://img.shields.io/github/stars/revfactory/harness?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/cookyman74/my_harness/stargazers"><img src="https://img.shields.io/github/stars/cookyman74/my_harness?style=social" alt="GitHub Stars"></a>
 </p>
 
 <p align="center">
@@ -102,7 +102,7 @@ Phase 7: ハーネス進化（フィードバック → 継続更新）
 
 #### マーケットプレイスの追加
 ```shell
-/plugin marketplace add revfactory/harness
+/plugin marketplace add cookyman74/my_harness
 ```
 
 #### プラグインのインストール
@@ -284,11 +284,11 @@ Harness は Claude Code / エージェントフレームワークのエコシス
 
 ### Harness 100
 
-**[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 10ドメイン、100のプロダクションレディなエージェントチームハーネス（英韓200パッケージ）。各ハーネスには4〜5名の専門エージェント、オーケストレータースキル、ドメイン特化スキルが含まれており、すべて本プラグインで生成されました。コンテンツ制作、ソフトウェア開発、データ/AI、ビジネス戦略、教育、法律、ヘルスケアなど1,808のMarkdownファイル。
+**[cookyman74/my_harness-100](https://github.com/cookyman74/my_harness-100)** — 10ドメイン、100のプロダクションレディなエージェントチームハーネス（英韓200パッケージ）。各ハーネスには4〜5名の専門エージェント、オーケストレータースキル、ドメイン特化スキルが含まれており、すべて本プラグインで生成されました。コンテンツ制作、ソフトウェア開発、データ/AI、ビジネス戦略、教育、法律、ヘルスケアなど1,808のMarkdownファイル。
 
 ### 研究：Harness適用前後のA/Bテスト
 
-**[revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)** — 15のソフトウェアエンジニアリング課題を対象とした統制実験で、構造化された事前設定がLLMコードエージェントの出力品質に与える影響を測定しました。
+**[cookyman74/claude-code-harness](https://github.com/cookyman74/claude-code-harness)** — 15のソフトウェアエンジニアリング課題を対象とした統制実験で、構造化された事前設定がLLMコードエージェントの出力品質に与える影響を測定しました。
 
 | 指標 | Harness未適用 | Harness適用 | 改善 |
 |------|:-:|:-:|:-:|
@@ -314,7 +314,7 @@ Harness は Claude Code / エージェントフレームワークのエコシス
 **A.** +60% は **著者自身による A/B（n=15、15 タスク、姉妹リポジトリ `claude-code-harness` で計測）** の結果です。本リポジトリでは、この数値を引用する際は必ず「n=15、著者測定、第三者再現実験は進行中」を同じ文の中に併記しています。組織導入時には、2〜4 週間の社内パイロットで独自の数値を測定することを推奨します。
 
 **Evidence:**
-- 著者 A/B: [revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)
+- 著者 A/B: [cookyman74/claude-code-harness](https://github.com/cookyman74/claude-code-harness)
 - 論文: *Hwang, M. (2026). Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality*
 </details>
 

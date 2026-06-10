@@ -39,7 +39,7 @@ Different kinds of contributions go through different entry points. Pick the one
 
 ### Question
 
-- Open an issue using the **Question** form, **or** start a thread in [GitHub Discussions](https://github.com/revfactory/harness/discussions) if the matter is open-ended.
+- Open an issue using the **Question** form, **or** start a thread in [GitHub Discussions](https://github.com/cookyman74/my_harness/discussions) if the matter is open-ended.
 
 ### Discussion (RFC-sized ideas)
 
@@ -53,7 +53,7 @@ Different kinds of contributions go through different entry points. Pick the one
 ### Security
 
 - Do **not** open a public issue for anything that could be abused.
-- Email: `robin.hwang@kakaocorp.com` with subject prefix `[harness-security]`.
+- Email: `cookyman@gmail.com` with subject prefix `[harness-security]`.
 - We aim to acknowledge within 7 days (see SLA table).
 
 ---
@@ -189,7 +189,7 @@ This project adheres to the **Contributor Covenant v1.4** — in short:
 
 Full text: <https://www.contributor-covenant.org/version/1/4/code-of-conduct/>
 
-Report Code of Conduct violations privately to `robin.hwang@kakaocorp.com` with subject prefix `[harness-coc]`.
+Report Code of Conduct violations privately to `cookyman@gmail.com` with subject prefix `[harness-coc]`.
 
 ---
 
@@ -197,7 +197,7 @@ Report Code of Conduct violations privately to `robin.hwang@kakaocorp.com` with 
 
 | Role | Handle | Area |
 |------|--------|------|
-| Lead maintainer | [@revfactory](https://github.com/revfactory) | Project direction, releases, final review |
+| Lead maintainer | [@cookyman74](https://github.com/cookyman74) | Project direction, releases, final review |
 | Contributor | [@hnts03](https://github.com/hnts03) | Skill templates, Korean documentation |
 | Contributor | [@JunghwanNA](https://github.com/JunghwanNA) | Agent patterns, integration tests |
 | Contributor | [@shaun0927](https://github.com/shaun0927) | Tooling, CI, infra |

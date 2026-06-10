@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
   <img src="https://img.shields.io/badge/Mode-Agent_Teams-green.svg" alt="Agent Teams">
-  <a href="https://github.com/revfactory/harness/stargazers"><img src="https://img.shields.io/github/stars/revfactory/harness?style=social" alt="GitHub Stars"></a>
+  <a href="https://github.com/cookyman74/my_harness/stargazers"><img src="https://img.shields.io/github/stars/cookyman74/my_harness?style=social" alt="GitHub Stars"></a>
 </p>
 
 <p align="center">
@@ -102,7 +102,7 @@ Phase 7: 하네스 진화 (피드백 → 지속 갱신)
 
 #### 마켓플레이스 추가
 ```shell
-/plugin marketplace add revfactory/harness
+/plugin marketplace add cookyman74/my_harness
 ```
 
 #### 플러그인 설치
@@ -277,11 +277,11 @@ Harness는 Claude Code / 에이전트 프레임워크 생태계에서 혼자가 
 
 ### Harness 100
 
-**[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 10개 도메인, 100개의 프로덕션 레디 에이전트 팀 하네스 (한영 200패키지). 각 하네스에 4-5명의 전문 에이전트, 오케스트레이터 스킬, 도메인 특화 스킬이 포함되어 있으며, 모두 이 플러그인으로 생성되었습니다. 콘텐츠 제작, 소프트웨어 개발, 데이터/AI, 비즈니스 전략, 교육, 법률, 헬스케어 등 1,808개 마크다운 파일.
+**[cookyman74/my_harness-100](https://github.com/cookyman74/my_harness-100)** — 10개 도메인, 100개의 프로덕션 레디 에이전트 팀 하네스 (한영 200패키지). 각 하네스에 4-5명의 전문 에이전트, 오케스트레이터 스킬, 도메인 특화 스킬이 포함되어 있으며, 모두 이 플러그인으로 생성되었습니다. 콘텐츠 제작, 소프트웨어 개발, 데이터/AI, 비즈니스 전략, 교육, 법률, 헬스케어 등 1,808개 마크다운 파일.
 
 ### 연구: Harness 적용 전후 A/B 테스트
 
-**[revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)** — 15개 소프트웨어 엔지니어링 과제에 대한 통제 실험으로, 구조화된 사전 설정이 LLM 코드 에이전트 출력 품질에 미치는 영향을 측정했습니다.
+**[cookyman74/claude-code-harness](https://github.com/cookyman74/claude-code-harness)** — 15개 소프트웨어 엔지니어링 과제에 대한 통제 실험으로, 구조화된 사전 설정이 LLM 코드 에이전트 출력 품질에 미치는 영향을 측정했습니다.
 
 | 지표 | Harness 미적용 | Harness 적용 | 개선 |
 |------|:-:|:-:|:-:|
@@ -307,7 +307,7 @@ Harness는 Claude Code / 에이전트 프레임워크 생태계에서 혼자가 
 **A.** +60%는 **저자 자체 A/B(n=15, 15개 과제, 자매 저장소 `claude-code-harness`에서 측정)** 결과입니다. 본 저장소는 이 수치를 인용할 때 언제나 "n=15, 저자 자체 측정, 제3자 재현 진행 중"을 같은 문장 안에 병기합니다. 조직 도입 시에는 2~4주 내부 파일럿으로 자체 수치를 측정할 것을 권장합니다.
 
 **Evidence:**
-- 저자 A/B: [revfactory/claude-code-harness](https://github.com/revfactory/claude-code-harness)
+- 저자 A/B: [cookyman74/claude-code-harness](https://github.com/cookyman74/claude-code-harness)
 - 논문: *Hwang, M. (2026). Harness: Structured Pre-Configuration for Enhancing LLM Code Agent Output Quality*
 </details>
 
