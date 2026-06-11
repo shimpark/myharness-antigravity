@@ -48,7 +48,8 @@ Harness lives at the **L3 Meta-Factory** layer of the Claude Code ecosystem — 
 - **Validation** — Trigger verification, dry-run testing, and with-skill vs without-skill comparison tests
 - **Two-Layer Quality Gate** — Internal Producer-Reviewer QA **plus** an external independent review loop (`external-review-loop`): codex/gemini CLIs review each stage's deliverable, the orchestrator adjudicates every issue against real code (confirm/partial/defer/reject), and only confirmed issues are fixed via TDD. Tool availability is checked first (`check-review-tools.sh`) so the skill is skipped when codex/gemini are absent.
 - **Doctrine Injection** — Generated code/modification agents get TDD (`tdd-doctrine.md`) and development-rules (`dev-rules.md`) doctrine injected by real path, with risk-tiered gate strength (light / standard / critical).
-- **Dual Runtime (Claude Code + Codex)** — One source of truth (`skills/myharness/`), thin per-runtime adapters. The factory emits both `CLAUDE.md` and `AGENTS.md` pointers and adapts orchestration (Claude `TeamCreate` ↔ Codex native subagents / `codex exec`). See `references/runtime-adapters.md`.
+- **Dual Runtime (Claude Code + Codex)** — One source of truth (`skills/myharness/`), thin per-runtime adapters. The factory emits both `CLAUDE.md` and `AGENTS.md` pointers and adapts orchestration (Claude `TeamCreate` ↔ Codex native subagents / `codex exec`), with a Phase-7 runtime-sync step to prevent drift. See `references/runtime-adapters.md`.
+- **Cost & Concurrency Control** — model routing (high-reasoning → `opus`, simple tasks → light models), concurrency caps with backpressure (default 3 / max 5), external-review budget (skip-when-no-delta, `.fast-pass`), and smoke/full test modes keep large fan-outs affordable. Portable tooling (`timeout`/`gtimeout` detection, process cleanup).
 
 
 ## Philosophy — Skill ↔ Agent
@@ -79,7 +80,7 @@ Phase 5: Integration & Orchestration (+ two-layer quality gate, dual-runtime out
     ↓
 Phase 6: Validation & Testing
     ↓
-Phase 7: Harness Evolution (feedback → continuous update)
+Phase 7: Harness Evolution (feedback → continuous update; dual-runtime sync)
 ```
 
 ## Installation
