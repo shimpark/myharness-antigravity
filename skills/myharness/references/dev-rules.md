@@ -25,4 +25,4 @@ LLM 코딩 흔한 실수를 줄이는 행위 가이드. 생성된 빌더/수정 
 - 다단계는 간단 계획: `[단계] → 검증: [확인]`.
 
 ## 주입 방법 (F1 — 실경로)
-팩토리는 이 파일을 타겟 하네스의 `.claude/skills/{harness}/references/dev-rules.md`로 **복사**한 뒤, 에이전트 정의 `## 작업 원칙`에 **타겟 실경로** 한 줄을 넣는다: `> 개발 규칙: \`.claude/skills/{harness}/references/dev-rules.md\` 준수.` 서브에이전트는 `[[ ]]`·플러그인 내부 경로를 해소 못 하므로 타겟상대 실경로 필수. 본문 복붙 금지(DRY). 비코드 에이전트(문서·리서치)는 dev-rules만 선택 적용(TDD 제외).
+팩토리는 이 파일을 타겟 하네스의 `.claude/skills/{harness-name}/references/dev-rules.md`로 **복사**한 뒤, 에이전트 정의 `## 작업 원칙`에 **타겟 실경로** 한 줄을 넣는다: `> 개발 규칙: \`.claude/skills/{harness-name}/references/dev-rules.md\` 준수.` 서브에이전트는 `[[ ]]`·플러그인 내부 경로를 해소 못 하므로 타겟상대 실경로 필수. 본문 복붙 금지(DRY). 비코드 에이전트(문서·리서치)는 dev-rules만 선택 적용(TDD 제외).
