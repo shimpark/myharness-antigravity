@@ -107,7 +107,7 @@ Phase 7: ハーネス進化（フィードバック → 継続更新）
 
 #### プラグインのインストール
 ```shell
-/plugin install harness-marketplace
+/plugin install harness@harness-marketplace
 ```
 
 ### グローバルスキルとして直接インストール
