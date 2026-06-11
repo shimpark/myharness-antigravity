@@ -312,7 +312,7 @@ Phase마다 다른 모드를 섞어 구성한다. 자주 쓰이는 조합:
 | 표준 | 다파일·기능 추가 | 내부 QA + 외부리뷰 **1회**(단계 끝) |
 | 중대 | 계약 변경·비가역·다도메인 | **단계마다** 외부리뷰 + 승인 사다리(PRD→계획서→실행: 각 관문마다 사용자 승인+외부리뷰, 반려 시 해당 단계 재작업; 승인 관문 절차는 external-review-loop Step 7 준용) |
 
-**단계 마감 게이트(표준·중대):** 오케스트레이터가 `external-review-loop` 스킬 호출 — codex/gemini 병렬 → 전건 판정(확인/부분/이월/기각) → 확인분만 TDD 수정 → 게이트 PASS. 판정 권위는 오케스트레이터(위임 금지). 상세: `references/external-review-loop.md`.
+**단계 마감 게이트(표준·중대):** 오케스트레이터가 `external-review-loop` 스킬 호출 — **라운드 반복 루프**(codex/gemini 병렬 → 판정 → 확인분만 TDD 수정·게이트 → 수정 diff 재리뷰). **loop-until-dry**(신규 확인 0건 K회 연속) 또는 MAX_ROUNDS에서 종료. 판정 원장(`verdicts.json`)으로 신규만 판정. 근거 수집은 위임 가능하나 **최종 확정은 오케스트레이터 비위임**. 상세: `references/external-review-loop.md`.
 
 **커밋 순서(순환 제거):** 리뷰→판정→수정→게이트 PASS → **승인 관문** → 단일 커밋. (리뷰는 커밋 *전* 작업트리/스테이지 대상 — "커밋 직후 리뷰" 아님.)
 - 승인 관문 기본: 사용자 승인 대기.
@@ -484,6 +484,6 @@ Phase마다 다른 모드를 섞어 구성한다. 자주 쓰이는 조합:
 - **스킬 작성 가이드**: `references/skill-writing-guide.md` — 작성 패턴, 예시, 데이터 스키마 표준
 - **스킬 테스트 가이드**: `references/skill-testing-guide.md` — 테스트/평가/반복 개선 방법론
 - **QA 에이전트 가이드**: `references/qa-agent-guide.md` — 빌드 하네스에 QA 에이전트를 포함할 때 참조. 통합 정합성 검증 방법론, 경계면 버그 패턴, QA 에이전트 정의 템플릿 포함. 실제 프로젝트에서 발견된 7개 버그 사례 기반.
-- **외부 리뷰 루프**: `references/external-review-loop.md` — 코드/설계 도메인 하네스에 codex/gemini 독립 검증 단계 게이트를 넣을 때 참조. 방법론 겸 생성 템플릿. 전건 판정·기각 사유표·커밋 순서·자율 노브 포함.
+- **외부 리뷰 루프**: `references/external-review-loop.md` — codex/gemini 독립 검증 단계 게이트. 방법론 겸 생성 템플릿. **루프 제어(loop-until-dry·MAX_ROUNDS·라운드 카운터)·판정 원장(verdicts.json, dedup vs seen)·수정본 재리뷰·근거수집 위임/확정 비위임**·기각 사유표·커밋 순서·자율 노브 포함.
 - **TDD 교리 / 개발 규칙**: `references/tdd-doctrine.md`, `references/dev-rules.md` — 코드/수정 에이전트 작업 원칙 주입용.
 - **런타임 어댑터**: `references/runtime-adapters.md` — Claude Code/Codex 듀얼 런타임 설계. 진입점·오케스트레이션 매핑, AGENTS.md·`.agents/skills/` 생성, 설치(Codex 공식 docs 검증).
