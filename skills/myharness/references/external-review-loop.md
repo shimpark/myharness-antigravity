@@ -100,8 +100,10 @@ wait
    - **push는 자율이어도 기본 대기** — `_workspace/.autonomous-push` 마커 시만 자동.
    - 권한모드(bypassPermissions)는 스킬이 못 읽으므로 마커/발화로 명시. 마커 ON이어도 리뷰·판정·게이트는 그대로(인간 승인 한 스텝만 생략).
 
-## Step 8 — 자체 평가 (1단계: 측정 로깅만)
-루프 종료 시 `_workspace/evals/external-review/{단계ID}/{run_id}/scorecard.json` 발행 — `rounds`·`termination_reason`·`verdict_counts`·`new_per_round`·`alignment_score`(정밀도 아님)·`rounds_normalized`·`cost_per_run`·`cost_per_confirmed`(confirmed>0만). **측정·기록만**. 자동 흐름 변경 없음(자기강화·플래핑 방지). 스키마·메트릭 정의·단계적 도입(수동 리포트→제안 트리거→자동)은 `loop-self-eval.md`. recall(놓친 결함)은 Ground Truth 있을 때만.
+## Step 8 — 자체 평가 (1단계: 측정 로깅만, 계산 도출)
+루프 종료 시 **`bash scripts/build-scorecard.sh {단계ID}_verdicts.json _workspace/evals/external-review/{단계ID}/{run_id}/scorecard.json [timing.json]`** 실행 — verdict_counts·rounds·`alignment_score`(정밀도 아님)·`*_rate`·cost·**`regression_catch_rate`**(round>1 재리뷰가 잡은 회귀/누출 — 전체 recall 아님)를 **스크립트가 verdicts.json에서 기계 계산**(LLM 자기보고 아님). 라벨(`converged-good`/`converged`/`max-rounds`/...)만 오케스트레이터가 해석. **측정·기록만**, 자동 흐름 변경 없음.
+- `verdicts.json` 각 이슈에 `round`·`source` 기록(round>1 재리뷰분은 `source:"re-review"`)해야 regression_catch_rate 계산됨.
+- 스크립트가 `summary.jsonl`에 집계 append → Phase 0/7 진입 시 **요약만** 읽음(읽기 경로, Lean). 스키마·졸업 기준·단계적 도입은 `loop-self-eval.md`. (jq 필요)
 
 ## 재진입 (루프 라운드 = 재진입)
 재진입은 위 **루프 제어**의 라운드 반복으로 일원화한다. round>1은 직전 수정분 diff만 좁게 재리뷰하고, `verdicts.json` seen 대조로 기수정·기각 이슈는 다시 판정하지 않는다("기수정 확인"은 원장+게이트 재실행으로 갈음). 사용자가 동일 목록을 수동 재제출해도 원장 대조 → 신규만 판정.
