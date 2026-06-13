@@ -18,6 +18,7 @@
 | 내부 QA(생성-검증) · 듀얼 런타임 · 리스크 등급 · 모델 라우팅 | ✅ active | |
 | external-review-loop(수렴·원장·재리뷰) | ✅ active | codex/gemini 설치 시. `check-review-tools.sh` |
 | `build-scorecard.sh`(loop_scorecard) | ✅ active (측정 로깅만) | 1단계. 자동 환류 없음 |
+| `run-policy-audit.sh`(팩토리 레포 정책 감사) | ✅ active | 정적·읽기전용. **팩토리 레포 자체만**(생성 하네스 아님). Phase 7-5 Step 4. warn≠block |
 | loop-self-eval 단계 3·4(제안·자동 환류) | 🧪 **실험적·비활성** | 데이터·holdout 후 |
 | self-improvement-loop | 📐 **설계만** | `run-benchmark.sh` **미구현** → 현재 실행 불가 |
 > 🧪/📐 기능은 **생성된 하네스가 자동 실행하지 않는다**. "있다고 적힌" 것 ≠ "돈다". MVP 전까지 설계 참조용.
