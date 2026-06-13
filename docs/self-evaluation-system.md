@@ -259,7 +259,7 @@ Full 평가는 비용이 크므로 다음 조건에서만 실행한다. **단, "
 
 우선 구현 순서 (성능 MVP 경계):
 
-1. **1차:** `run-self-eval-smoke.sh`(정적 검사만) + `self_eval_scorecard.json` 스키마 + **fail-open 저장**(케이스별 run-id 디렉토리, `scorecards/index.jsonl` append-only 요약)
+1. **1차:** 팩토리 레포 자체 정책 감사 = **`scripts/run-policy-audit.sh` (구현됨 ✅)** — 링크 정합·SKILL ≤500·stale 식별자·버전 정합·듀얼런타임 parity·JSON·bash -n 정적 점검(증거법 1 실체화). *생성된 하네스* 산출물 평가는 `run-self-eval-smoke.sh`(미구현) + `self_eval_scorecard.json` 스키마 + **fail-open 저장**(run-id 디렉토리, `scorecards/index.jsonl` append-only)
 2. **2차:** 반복 실패 집계(요약 인덱스만 읽기, 상세 lazy load)
 3. **3차:** 수동 full(blind judge)
 4. **4차:** golden/baseline/external benchmark (가장 무겁고 마지막)
