@@ -30,8 +30,19 @@ CMD="${1:-}"; SKILL_DIR="${2:-}"; FACTORY="${3:-}"
 [ -d "$FACTORY" ]   || { echo "오류: factory_dir 없음 — $FACTORY" >&2; exit 2; }
 MANIFEST="$SKILL_DIR/.harness-manifest.json"
 
-sha() { if command -v sha256sum >/dev/null 2>&1; then sha256sum "$1" | cut -d' ' -f1
-        else shasum -a 256 "$1" | cut -d' ' -f1; fi; }
+# sha 도구 1회 결정 + 검증(둘 다 없으면 즉시 종료 — 빈 해시 오염으로 오분류되는 것 방지).
+if command -v sha256sum >/dev/null 2>&1; then SHA_CMD="sha256sum"
+elif command -v shasum >/dev/null 2>&1; then SHA_CMD="shasum -a 256"
+else echo "오류: sha256sum/shasum 둘 다 없음 — 해시 비교 불가." >&2; exit 2; fi
+sha() { $SHA_CMD "$1" | cut -d' ' -f1; }
+
+# 원자적 복사 — temp로 복사 후 mv(중단/오류 시 대상이 반쯤 덮인 파손 상태 방지). 실패 시 non-zero.
+atomic_cp() {
+  local src="$1" dst="$2" t
+  mkdir -p "$(dirname "$dst")" || return 1
+  t="$dst.tmp.$$"
+  cp "$src" "$t" 2>/dev/null && mv "$t" "$dst" || { rm -f "$t" 2>/dev/null; return 1; }
+}
 
 # 관리 대상 화이트리스트(상대경로) — 생성 하네스에 번들되는 것만.
 MANAGED_RELS="references/dev-rules.md references/tdd-doctrine.md scripts/check-review-tools.sh scripts/build-scorecard.sh"
@@ -77,7 +88,10 @@ case "$CMD" in
     if ! command -v jq >/dev/null 2>&1; then
       echo "오류: manifest 생성엔 jq 필요(미설치)." >&2; exit 2; fi
     fac_ver="$(jq -r '.version // "unknown"' "$FACTORY/../../.claude-plugin/plugin.json" 2>/dev/null || echo unknown)"
-    tmp="$(mktemp)"; printf '{"schema_version":"1","factory_version":"%s","files":{' "$fac_ver" > "$tmp"
+    # temp는 대상과 같은 디렉토리에 — mv가 동일 파일시스템 내 원자 교체가 되도록(/tmp는 copy+rm로 비원자).
+    tmp="$MANIFEST.tmp.$$"
+    printf '{"schema_version":"1","factory_version":"%s","files":{' "$fac_ver" > "$tmp" || {
+      echo "오류: manifest temp 쓰기 실패 — $tmp" >&2; exit 2; }
     first=1
     while IFS= read -r rel; do
       [ -n "$rel" ] || continue
@@ -85,15 +99,17 @@ case "$CMD" in
       printf '"%s":"%s"' "$rel" "$(sha "$SKILL_DIR/$rel")" >> "$tmp"
     done < <(list_managed "$SKILL_DIR")
     printf '}}\n' >> "$tmp"
-    if command -v jq >/dev/null 2>&1; then jq . "$tmp" > "$MANIFEST" 2>/dev/null || mv "$tmp" "$MANIFEST"; else mv "$tmp" "$MANIFEST"; fi
-    rm -f "$tmp"
+    # jq로 정렬·검증 후 원자 mv. jq 포맷 실패 시 raw도 유효 JSON이므로 그대로 mv.
+    if jq . "$tmp" > "$tmp.j" 2>/dev/null; then mv "$tmp.j" "$MANIFEST" && rm -f "$tmp"; else mv "$tmp" "$MANIFEST"; fi
     echo "manifest → $MANIFEST ($(list_managed "$SKILL_DIR" | grep -c . ) 파일)"
     ;;
 
   plan)
     [ -f "$MANIFEST" ] || echo "주의: manifest 없음 → 모든 변경 파일을 USER-MODIFIED/UNKNOWN(보수)로 취급, 승인 필요." >&2
     command -v jq >/dev/null 2>&1 || echo "주의: jq 없음 → 사용자 수정 판정 불가 → 보수 모드(승인 필요)." >&2
-    n_same=0 n_auto=0 n_ask=0
+    # manifest가 있는데 JSON이 파손됐으면 조용히 보수모드로 흡수하지 말고 명시 경고(원인 식별).
+    [ -f "$MANIFEST" ] && command -v jq >/dev/null 2>&1 && ! jq -e . "$MANIFEST" >/dev/null 2>&1 \
+      && echo "주의: manifest JSON 파손 → 전부 보수(승인 필요). 'manifest' 재생성 권장." >&2
     { list_managed "$SKILL_DIR"; list_factory_new; } | sort -u | while IFS= read -r rel; do
       [ -n "$rel" ] || continue
       st="$(classify "$rel")"
@@ -101,11 +117,11 @@ case "$CMD" in
         SAME)           echo "  [SAME]          $rel" ;;
         UPDATABLE|NEW)  echo "  [$st] $rel  → 자동 적용 가능"
                         if [ -f "$SKILL_DIR/$rel" ] && [ -f "$FACTORY/$rel" ]; then
-                          diff -u "$SKILL_DIR/$rel" "$FACTORY/$rel" 2>/dev/null | sed -n '1,12p' | sed 's/^/      /'
+                          diff -u "$SKILL_DIR/$rel" "$FACTORY/$rel" 2>/dev/null | head -n 12 | sed 's/^/      /'
                         fi ;;
         USER-MODIFIED|UNKNOWN)
                         echo "  [$st] $rel  → 승인 필요(--approve $rel)"
-                        diff -u "$SKILL_DIR/$rel" "$FACTORY/$rel" 2>/dev/null | sed -n '1,20p' | sed 's/^/      /' ;;
+                        diff -u "$SKILL_DIR/$rel" "$FACTORY/$rel" 2>/dev/null | head -n 20 | sed 's/^/      /' ;;
         FACTORY-MISSING) echo "  [FACTORY-MISSING] $rel  (정본에 없음 — 사용자 전용/구파일)" ;;
       esac
     done
@@ -115,18 +131,20 @@ case "$CMD" in
   apply)
     approve=""
     if [ "${4:-}" = "--approve" ]; then approve=",${5:-},"; fi
-    applied=0; skipped=0
+    [ -f "$MANIFEST" ] && command -v jq >/dev/null 2>&1 && ! jq -e . "$MANIFEST" >/dev/null 2>&1 \
+      && echo "주의: manifest JSON 파손 → 전부 보수(승인 필요). 'manifest' 재생성 권장." >&2
     { list_managed "$SKILL_DIR"; list_factory_new; } | sort -u | while IFS= read -r rel; do
       [ -n "$rel" ] || continue
       st="$(classify "$rel")"
       case "$st" in
         SAME|FACTORY-MISSING) : ;;
         UPDATABLE|NEW)
-          mkdir -p "$(dirname "$SKILL_DIR/$rel")"; cp "$FACTORY/$rel" "$SKILL_DIR/$rel"
-          echo "  적용(자동) [$st] $rel" ;;
+          if atomic_cp "$FACTORY/$rel" "$SKILL_DIR/$rel"; then echo "  적용(자동) [$st] $rel"
+          else echo "  오류: 적용 실패 [$st] $rel — 건너뜀" >&2; fi ;;
         USER-MODIFIED|UNKNOWN)
           if [ -n "$approve" ] && case "$approve" in *",$rel,"*) true;; *) false;; esac; then
-            cp "$FACTORY/$rel" "$SKILL_DIR/$rel"; echo "  적용(승인) [$st] $rel"
+            if atomic_cp "$FACTORY/$rel" "$SKILL_DIR/$rel"; then echo "  적용(승인) [$st] $rel"
+            else echo "  오류: 적용 실패 [$st] $rel — 건너뜀" >&2; fi
           else
             echo "  보류 [$st] $rel  (승인 안 됨 — 사용자 수정 보존)"
           fi ;;

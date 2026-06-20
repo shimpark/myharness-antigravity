@@ -51,18 +51,18 @@ if [ -z "$runner" ]; then
 fi
 
 # 권고: agy가 있으면 Gemini 리뷰는 agy로(gemini는 deprecated). 둘 다 있으면 agy 우선.
-printf '%s\n' "${avail[@]:-}" | grep -q '^agy$' && printf '%s\n' "${avail[@]:-}" | grep -q '^gemini$' && echo "note: agy·gemini 공존 → agy 우선(gemini legacy)"
+printf '%s\n' ${avail[@]+"${avail[@]}"} | grep -q '^agy$' && printf '%s\n' ${avail[@]+"${avail[@]}"} | grep -q '^gemini$' && echo "note: agy·gemini 공존 → agy 우선(gemini legacy)"
 
 # 리뷰어 = 사용가능 도구 중 러너 엔진 제외. (codex↔claude는 일반 리뷰어, agy/gemini는 성능 리뷰어)
 reviewers=()
-for t in "${avail[@]:-}"; do
+for t in ${avail[@]+"${avail[@]}"}; do
   [ -z "$t" ] && continue
   [ "$t" = "$runner" ] && continue   # 러너 엔진 = 외부 리뷰어 자격 없음(독립성)
   reviewers+=("$t")
 done
 # agy·gemini 공존 시 gemini는 legacy → 리뷰어에서 제외(agy 우선).
-if printf '%s\n' "${reviewers[@]:-}" | grep -q '^agy$'; then
-  filtered=(); for t in "${reviewers[@]:-}"; do [ "$t" = "gemini" ] || filtered+=("$t"); done; reviewers=("${filtered[@]:-}")
+if printf '%s\n' ${reviewers[@]+"${reviewers[@]}"} | grep -q '^agy$'; then
+  filtered=(); for t in ${reviewers[@]+"${reviewers[@]}"}; do [ "$t" = "gemini" ] || filtered+=("$t"); done; reviewers=(${filtered[@]+"${filtered[@]}"})
 fi
 
 # 상태는 끝줄들로만 전달한다. 항상 exit 0.
