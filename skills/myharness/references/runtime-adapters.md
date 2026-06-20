@@ -25,7 +25,7 @@
 | 설정 | settings.json | `.codex/config.toml`(프로젝트, trusted) + `~/.codex/config.toml` | 🟡 |
 | MCP | settings/플러그인 | `config.toml`의 `mcp_servers.<id>` | ✅ |
 | 커스텀 슬래시 | `commands/*.md` | ❌ `~/.codex/prompts/*.md`·`$ARGUMENTS` 0.137.0 미지원 | 🔴 생략 |
-| 외부 리뷰(codex/agy 호출) | subprocess | subprocess (동일) | ✅ 공짜 |
+| 외부 리뷰(subprocess 호출) | 리뷰어 = **codex + agy** (러너=claude 제외) | 리뷰어 = **claude + agy** (러너=codex 제외) | 🟡 러너 제외 분기 |
 | 스크립트(scripts/) | bash | bash | ✅ |
 
 핵심: 스킬 본문은 **포맷 동일** → 거의 그대로 공유. 진짜 변환이 필요한 건 에이전트 정의(md→toml)와 오케스트레이션뿐.
@@ -43,7 +43,7 @@
 - **Claude Code:** `TeamCreate`+`SendMessage`+`TaskCreate` (템플릿 A).
 - **Codex:** 네이티브 subagents로 병렬 specialized agents spawn(`/agent` 전환, `.codex/agents/*.toml`), 또는 독립 병렬이 필요하면 `codex exec` subprocess. 데이터는 `_workspace/` 파일 기반(템플릿 D).
   - `codex exec` 베스트 프랙티스(검증): 기본 read-only / 쓰기 작업만 `--sandbox workspace-write` / 스크립트 소비는 `--json` / 최종 메시지만 `-o`(`--output-last-message`) / 격리는 `--ignore-user-config` / stdin은 `< /dev/null`.
-- external-review-loop 게이트는 양쪽 동일(이미 subprocess).
+- external-review-loop 게이트는 양쪽 subprocess로 동일하나, **리뷰어 집합은 러너 엔진을 제외**한다(독립성 = 엔진 다양성). `check-review-tools.sh [runner]`가 `REVIEWERS:` 줄로 러너 제외분을 산출 — Claude Code면 `codex+agy`, Codex면 `claude+agy`. 상세: `external-review-loop.md` 독립성 절·Step 2.
 
 ## 5. 생성 하네스의 듀얼 출력 (Phase 5-4)
 팩토리가 하네스 생성 시:
