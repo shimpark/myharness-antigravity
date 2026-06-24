@@ -1,321 +1,258 @@
 <p align="center">
-  <img src="harness_banner.png" alt="Harness Banner" width="600">
+  <img src="harness_banner.png" alt="myharness バナー" width="600">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-1.1.1-brightgreen.svg" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
+  <img src="https://img.shields.io/badge/Runtime-Claude_Code_+_Codex-blueviolet.svg" alt="Dual Runtime">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
-  <img src="https://img.shields.io/badge/Mode-Agent_Teams-green.svg" alt="Agent Teams">
+  <img src="https://img.shields.io/badge/Quality_Gate-2--Layer-green.svg" alt="Two-Layer Quality Gate">
   <a href="https://github.com/cookyman74/my_harness/stargazers"><img src="https://img.shields.io/github/stars/cookyman74/my_harness?style=social" alt="GitHub Stars"></a>
 </p>
 
-<p align="center">
-  <a href="#カテゴリー--harness-はどこに位置するか"><img src="https://img.shields.io/badge/Layer-L3%20Meta--Factory-orange" alt="Layer"></a>
-  <a href="#カテゴリー--harness-はどこに位置するか"><img src="https://img.shields.io/badge/Sub--layer-Team--Architecture%20Factory-teal" alt="Sub-layer"></a>
-  <a href="#"><img src="https://img.shields.io/badge/README-EN%20%7C%20KO%20%7C%20JA-lightgrey" alt="i18n"></a>
-</p>
-
-# Harness — Claude Code のためのチームアーキテクチャファクトリー
+# myharness — エージェントチーム・アーキテクチャ・ファクトリー
 
 [English](README.md) | [한국어](README_KO.md) | **日本語**
 
-> **Harness は Claude Code 向けのチームアーキテクチャファクトリーです。** **「ハーネスを構成して」** (日本語) ·  **"build a harness for this project"** (English) · **"하네스 구성해줘"** (한국어) と伝えるだけで、プラグインがドメイン記述をエージェントチームとそのチームが使うスキルへと変換します — あらかじめ定義された 6 種類のチームアーキテクチャパターンから 1 つを選んで。
+> **myharness は、ドメインを一文で表すだけでエージェントチームとスキルに変換する Claude Code・Codex デュアルランタイムのファクトリーです。**
+> `「このプロジェクト用のハーネスを構成して」` の一言で — ドメインを分析し、専門エージェント定義（`.claude/agents/`）とスキル（`.claude/skills/`）を、6 つのチームアーキテクチャパターンの中から最適なもので生成します。
 
-## 概要
+---
 
-Harnessは、Claude Codeのエージェントチームシステムを活用し、複雑なタスクを専門エージェントチームに分解・統制するアーキテクチャツールです。「ハーネスを構成して」と伝えるだけで、ドメインに適したエージェント定義（`.claude/agents/`）とスキル（`.claude/skills/`）を自動生成します。
+## myharness とは？
 
-## カテゴリー — Harness はどこに位置するか
+複雑なタスクを 1 つの巨大なプロンプトで処理すると、コンテキストが汚染され、同じ盲点を繰り返し、再利用もできません。myharness はそのタスクを **役割が分離された専門エージェントチーム + 手順を収めたスキル + これらを束ねるオーケストレーター** へと分解して生成します。
 
-Harness は Claude Code エコシステムの **L3 Meta-Factory** 層 — 他のハーネスそのものではなく「他のハーネスを生成する層」 — に位置します。その層の中で、**Team-Architecture Factory** というサブ層を選択します。
+- **入力：** ドメインを表す一文（例：「ディープリサーチ」「フルスタック Web 開発」「コードレビュー」）
+- **出力：** エージェント定義 + スキル + オーケストレータースキル + エントリポインタ（`CLAUDE.md`／`AGENTS.md`）
+- **特徴：** 韓国語優先 · スリム基本（リスクが上がったときだけゲートを強化） · Claude Code／Codex 両方への出力
 
-| 層 | 担当領域 | 共存する隣人 |
-|----|----------|--------------|
-| **L3 — Meta-Factory / Team-Architecture Factory** (当プロジェクト) | ドメイン記述 → エージェントチーム + スキル、事前定義された 6 種のチームパターン経由 | — |
-| L3 — Meta-Factory / Runtime-Configuration Factory | 決定的で再現可能なランタイム構成 | [coleam00/Archon](https://github.com/coleam00/Archon) |
-| L3 — Meta-Factory / Codex Runtime Port | 同一コンセプトの Codex ランタイム版 | [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) |
-| L2 — Cross-Harness Workflow | 複数ハーネスにまたがるスキル・ルール・フックの標準化 | [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) |
+myharness 自体も 1 つのメタスキル（プラグイン）であり、**自身を進化させるシステム** として扱います — 実行フィードバックを該当レイヤー（スキル／エージェント／オーケストレーター）へ反映し、変更履歴を残します。
 
-> Archon は決定的なランタイム構成を生成します。Harness はチームアーキテクチャ（パイプライン・ファンアウト/ファンイン・エキスパートプール・プロデューサー-レビューア・スーパーバイザー・階層的委任）と、エージェントが使うスキルを生成します。同じ L3 の異なるサブ層です。ランタイムの決定性が欲しければ Archon、チームアーキテクチャが欲しければ Harness、あるいは両者を組み合わせて利用できます。
+## クイックスタート
 
-## 主な機能
+### 1. インストール（いずれか 1 つ）
 
-- **エージェントチーム設計** — パイプライン、ファンアウト/ファンイン、エキスパートプール、プロデューサー-レビューア、スーパーバイザー、階層的委任の6種アーキテクチャパターンに対応
-- **スキル生成** — Progressive Disclosureパターンによるコンテキストの効率的管理を備えたスキルを自動生成
-- **オーケストレーション** — エージェント間のデータ受け渡し、エラーハンドリング、チーム連携プロトコルを内蔵
-- **検証体制** — トリガー検証、ドライランテスト、With-skill vs Without-skill 比較テスト
-- **2層品質ゲート** — 内部のプロデューサー-レビューアQA **に加え** 外部独立レビューループ（`external-review-loop`）：独立レビューアCLIが各段階の成果物をレビューし、オーケストレーターが実コードと照合して全件判定（確認/部分/繰越/却下）、確認分のみTDDで修正。レビューアは**エンジン多様性**で選ぶ — ランナー自身のエンジンを除外し、AIが自分の盲点を自分でレビューしないようにする（Claude Code → codex + agy；Codex → claude + agy）。**収束ループ** — loop-until-dry＋ラウンド上限＋判定台帳（dedup vs seen、却下の再浮上防止）＋修正分の再レビュー。先にツール連携を点検（`check-review-tools.sh` がランナー除外の `REVIEWERS:` を出力）し、外部レビューアが無ければスキルを生成しない。
-- **ループ自己評価** — 各ループが `loop_scorecard.json`（alignment_score・判定カウント・正規化ラウンド・コスト・終了ラベル）を発行 → 段階的な自己改善（測定→手動レポート→提案→自動）、自己強化防止（提案のみ＋承認・ローリングウィンドウ・最小サンプル；recall は Ground Truth のみ）。詳細：`references/loop-self-eval.md`。
-- **ドクトリン注入** — 生成されたコード/修正エージェントにTDD（`tdd-doctrine.md`）・開発ルール（`dev-rules.md`）を実パスで注入。リスク等級（軽量/標準/重大）でゲート強度を調整。
-- **デュアルランタイム（Claude Code + Codex）** — 単一の出典（`skills/myharness/`）＋ランタイム別の薄いアダプター。ファクトリーが `CLAUDE.md`・`AGENTS.md` ポインターを両方出力し、オーケストレーションを分岐（Claude エージェントチーム — `Agent` ツール ↔ Codex ネイティブ subagents / `codex exec`）。Phase 7 のランタイム同期で drift を防止。詳細：`references/runtime-adapters.md`。
-- **ビルド済みハーネスの更新（Claude `/myharness update` · Codex `$myharness update`）** — プラグイン更新後、ファクトリーのドクトリン/スクリプトを既にビルド済みのハーネスへ再伝播しつつ、**ローカルの編集を上書きから保護**する。生成時に記録した `.harness-manifest.json` のベースラインで `harness-update.sh` がファイルごとにハッシュ分類 — SAME / UPDATABLE（自動）/ USER-MODIFIED（既定は保留；明示的な承認時に正本へ丸ごと置換、部分マージなし）/ UNKNOWN（保守 — manifest なし）/ NEW。独自ルールは `*.local.*` ファイルに分離すれば update-safe。詳細：`references/harness-update.md`。
-- **コスト・並行性の制御** — モデルルーティング（高推論 → `opus`、単純タスク → 軽量モデル）、並行数上限＋バックプレッシャー（既定 3・最大 5）、外部レビュー予算（skip-when-no-delta・`.fast-pass`）、smoke/full テストモードで大規模ファンアウトのコストを抑制。移植性ツール（`timeout`/`gtimeout` 検出・プロセス整理）。
-
-## 哲学 — スキル ↔ エージェント
-
-生成されたハーネスは **誰が** と **どうやって** を分離し、自身を進化するシステムとして扱う：
-
-- **関心の分離** — *エージェント*は「誰が」（専門家ペルソナ＋作業原則）、*スキル*は「どうやって」（手順＋ツール）。いずれもファイル（`.claude/agents/*.md`、`skills/*/SKILL.md`）でインライン禁止 → セッション横断で再利用。1エージェント＝1つの集中した役割、1エージェント↔1〜Nスキル（共有可）。
-- **エージェントチームが既定** — 2名以上はメッセージ・共有タスクリスト・`_workspace/` ファイルで自己調整。発見の共有・対立の議論・抜け漏れ補完が品質を高める。
-- **2層品質ゲート** — 内部のプロデューサー-レビューアQA **＋** 外部独立レビューループ（エンジン多様性のレビュアー — ランナーエンジンを除外）。オーケストレーターが全課題を実コードと照合して判定 — 合意は証拠ではない。リスク等級（軽量/標準/重大）で強度を調整。
-- **ドクトリン注入** — コード/修正エージェントにTDD（`tdd-doctrine.md`）・開発ルール（`dev-rules.md`）を実パスで注入（サブエージェントはグローバル規則を継承しない）。
-- **強制ではなくWhy、DRYなポインター** — 原則は*理由*を説明し（エッジケースの判断）、単一の出典を参照（複製禁止）。
-- **進化するシステム** — フィードバックを適切な層へ（成果物→スキル、役割→エージェント、順序→オーケストレーター、トリガー→description）ルーティングし、退行防止のため履歴を記録。
-
-> 要約：**オーケストレーター**が誰が/いつ/順序を決め、**エージェント**が「誰が」、**スキル**が「どうやって」、2層ゲートが品質を誠実に保つ。
-
-## ハーネス進化メカニズム (Harness Evolution Mechanism)
-
-ハーネス進化メカニズムは「何が効いて、何が効かなかったか」のデルタをファクトリーへフィードバックし、次世代が測定可能なかたちで改善されるようにします。生成されたハーネスが実プロジェクトで使用されると、**進化ワークフロー（Phase 7）** — Claude `/myharness`・Codex `$myharness` で呼び出し — が初期アーキテクチャとリリース時アーキテクチャのデルタを捕捉し、ファクトリーへ戻します。次回、同様のドメインでの生成は、このフィードバックを反映して「リリース状態により近いドラフト」から始まります。
-
-```
-初期ハーネス ──▶ 実プロジェクト利用 ──▶ リリース版ハーネス
-                                              │
-                                              ▼ (Phase 7 進化でデルタ取得)
-                                        ┌───────────────┐
-                                        │  ファクトリー │◀── より良い次世代ドラフト
-                                        └───────────────┘
-```
-
-これを **ハーネス進化メカニズム (Harness Evolution Mechanism; KR: 하네스 진화 메커니즘)** と呼びます。
-
-## ワークフロー
-
-```
-Phase 1: ドメイン分析
-    ↓
-Phase 2: チームアーキテクチャ設計（Agent Teams vs サブエージェント）
-    ↓
-Phase 3: エージェント定義の生成（.claude/agents/）
-    ↓
-Phase 4: スキル生成（.claude/skills/）
-    ↓
-Phase 5: 統合とオーケストレーション（+ 2層品質ゲート、デュアルランタイム出力）
-    ↓
-Phase 6: 検証とテスト
-    ↓
-Phase 7: ハーネス進化（フィードバック → 継続更新；デュアルランタイム同期）
-```
-
-## インストール
-
-### マーケットプレイス経由
-
-#### マーケットプレイスの追加
+**マーケットプレイス（推奨）**
 ```shell
 /plugin marketplace add cookyman74/my_harness
-```
-
-#### プラグインのインストール
-```shell
 /plugin install myharness@myharness-marketplace
 ```
 
-### グローバルスキルとして直接インストール
-
+**グローバルスキルとして直接コピー**
 ```shell
-# skillsディレクトリを ~/.claude/skills/myharness/ にコピー
 cp -r skills/myharness ~/.claude/skills/myharness
 ```
 
-### Codex CLI（デュアルランタイム）
-
-Codex は `~/.codex/skills/`（ユーザーグローバル）からスキルを検出し、untrusted プロジェクトでもスキルはロードされます。リポジトリの `install.sh` がライブのファクトリーをシンボリックリンクし、レビューツールを点検します：
-
+**Codex CLI（デュアルランタイム）** — リポジトリのルートで：
 ```shell
 bash install.sh
-# → ~/.codex/skills/myharness → skills/myharness（シンボリックリンク、常に最新）
-# → repo .agents/skills/myharness（trusted プロジェクト用）
-# → AGENTS.md（Codex が自動ロード）
+# → ~/.codex/skills/myharness  (正本シンボリックリンク、常に最新)
+# → .agents/skills/myharness   (trusted プロジェクト用)
+# → AGENTS.md                  (Codex 自動ロード)
 ```
 
-Codex では **`$myharness`**、**`/skills`** メニュー、または description に合致する依頼（例：「ハーネスを構成して」）で呼び出します。`/myharness` は Codex の構文では **ありません**（カスタムスラッシュ未対応）。インストール後はスキル一覧の再読み込みのため Codex セッションを再起動してください。
-
-## プラグイン構成
-
-```
-my_harness/
-├── .claude-plugin/
-│   └── plugin.json                 # プラグインマニフェスト (name: myharness)
-├── skills/
-│   └── myharness/
-│       ├── SKILL.md                # メインスキル定義（7フェーズワークフロー）
-│       ├── references/
-│       │   ├── factory-map.md             # 航法: 最小経路·実装状態·ループ地図（最初に読む）
-│       │   ├── agent-design-patterns.md   # 6種のアーキテクチャパターン
-│       │   ├── orchestrator-template.md   # チーム/サブ/Codex オーケストレーターテンプレート
-│       │   ├── team-examples.md           # 実践チーム構成例
-│       │   ├── skill-writing-guide.md     # スキル作成ガイド
-│       │   ├── skill-testing-guide.md     # テスト・評価方法論
-│       │   ├── qa-agent-guide.md          # QAエージェント統合ガイド
-│       │   ├── external-review-loop.md    # 外部レビューゲート、エンジン多様（収束ループ＋テンプレート）
-│       │   ├── loop-self-eval.md          # ループ scorecard（測定のみ; 3·4段階は実験的）
-│       │   ├── self-improvement-loop.md   # ベンチマーク基準の成果物改善（設計のみ）
-│       │   ├── tdd-doctrine.md            # TDDドクトリン（コードエージェント注入用）
-│       │   ├── dev-rules.md               # 開発ルール（コードエージェント注入用）
-│       │   ├── runtime-adapters.md        # Claude Code / Codex デュアルランタイム設計
-│       │   └── harness-update.md          # ビルド済みハーネス更新（ローカル編集を保護）
-│       └── scripts/
-│           ├── check-review-tools.sh      # レビュアー連携チェック（ランナー除外）
-│           ├── build-scorecard.sh         # verdicts から loop_scorecard 計算
-│           └── harness-update.sh          # ビルド済みハーネス更新（manifest/plan/apply）
-├── AGENTS.md                       # Codex ランタイムのエントリポイント
-├── install.sh                      # デュアルランタイムインストーラー（Claude + Codex）
-└── README.md
+### 2. エージェントチーム有効化 + CLI 起動 (Claude Code)
+```shell
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+claude   # Claude Code CLI 起動 (Codex は codex コマンド)
 ```
 
-## 使い方
+### 3. トリガー
+- **Claude Code：** `このプロジェクト用のハーネスを構成して` · `/myharness` · `このドメイン用のエージェントチームを設計して`
+- **Codex：** `$myharness` · `/skills` メニュー · `ハーネスを構成して`（説明マッチング）。インストール後はセッション再起動を推奨。（Codex はカスタムスラッシュコマンド非対応 — `/myharness` は不可）
 
-Claude Codeで以下のように呼び出します：
+> コピペ可能なドメイン別の例 → [使用例のプロンプト](#使用例のプロンプト)
+
+## 主な機能
+
+| 機能 | 内容 |
+|------|------|
+| **6 つのチームアーキテクチャ** | パイプライン · ファンアウト／ファンイン · エキスパートプール · 生成-検証 · スーパーバイザー · 階層的委譲。ドメインに合ったパターンを選択 |
+| **エージェントチーム基本** | チームメンバーを `Agent` ツールで spawn、`SendMessage` で直接通信、共有タスクリスト（`TaskCreate`）で自己調整。発見の共有・対立の議論で品質↑ |
+| **スキル自動生成** | Progressive Disclosure（メタデータ→本文→references の段階ロード）でコンテキスト効率化。トリガーの description は積極的に記述 |
+| **2 層品質ゲート** | 内部の生成-検証 QA **＋** 外部の独立レビューループ。詳細は下記 |
+| **教義の注入** | コード／修正エージェントの作業原則に TDD（`tdd-doctrine.md`）・開発ルール（`dev-rules.md`）を **実パス** で注入。リスク等級（軽量／標準／重大）でゲート強度を調整 |
+| **デュアルランタイム** | 単一の正本（`skills/myharness/`）+ ランタイム別の薄いアダプター。`CLAUDE.md`／`AGENTS.md` の両方を出力し、オーケストレーションを分岐（Claude は `Agent` チームメンバー spawn ↔ Codex はネイティブ subagents／`codex exec`）。Phase 7 の同期で drift を防止 |
+| **ビルド済みハーネスの更新** | `/myharness update`（Codex は `$myharness update`） — ファクトリーの正本を既にビルドされたハーネスへ再伝播しつつ **ローカル修正を保護**。`.harness-manifest.json` のハッシュ分類（SAME／自動／USER-MODIFIED 保留／NEW）、`*.local.*` で更新を安全に |
+| **コスト・並行性の制御** | モデルルーティング（高推論→`opus`、単純→軽量）、並行性 cap（デフォルト 3／最大 5）・バックプレッシャー、外部レビュー予算（変更がなければ skip）、smoke／full のテストモードで大規模 fan-out のコストを抑制 |
+| **ループ自己評価** | ループごとに `loop_scorecard.json`（整合度・判定分布・正規化ラウンド・コスト）を算出。**現在は測定ロギングのみ active**、提案→自動の還流は実験段階。anti-Goodhart ガード（指標の操作・過学習の防止） |
+
+### 2 層品質ゲート（コード／設計ドメイン）
+
+内部 QA は同じセッション・同じコンテキストのため **同じ盲点** を共有します。そこで外部の独立 AI レビューを別の軸として設けます。
+
+- **エンジンの多様性** — レビュアーはランナーエンジンを **除外** して選択（同じエンジン＝同じ盲点）。Claude Code 実行時は `codex`＋`agy`、Codex 実行時は `claude`＋`agy`。（`agy` = Gemini モデル）
+- **全件の直接判定** — 外部レビュアーは設計上の決定・凍結された契約・実測値を知らないため、報告された課題をオーケストレーターが **実コードと照合** して確認／部分／繰越／棄却で判定。合意＝正解ではなく、判定の権威はオーケストレーター（委譲禁止）。
+- **収束ループ** — loop-until-dry（新規 0 件が K 回連続）+ ラウンド cap、判定台帳（`verdicts.json`、再出現防止）、修正版の再レビュー。確認分のみ TDD で修正。
+- **ツール不在時はスキップ** — `check-review-tools.sh` がランナー除外の `REVIEWERS:` を算出し、外部レビュアーがいなければゲートを内部 QA に縮小（動作不能なスキルを防止）。
+
+> この README もこのゲートで検証されています — `codex`（整合性）+ `agy`（性能・安定性）の外部監査を経てコミット。
+
+## 動作原理 — スキル ↔ エージェント
+
+生成されたハーネスは **誰が（who）** と **どのように（how）** を分離します：
+
+- **エージェント = 誰が** — 専門家ペルソナ + 作業原則。`.claude/agents/{name}.md` ファイルで定義（インライン禁止 → セッション間で再利用）。1 エージェント = 1 役割。
+- **スキル = どのように** — 手順 + バンドルされたツール。`skills/{name}/SKILL.md`。1 エージェントが 1〜N 個のスキルを使用（共有可能）。
+- **オーケストレーター = 誰が・いつ・どの順序で** — 個々のエージェント／スキルを 1 つのワークフローへ束ねる。
+- **データの受け渡し** — メッセージ（リアルタイム調整）+ 共有タスクリスト（進捗追跡）+ ファイル（`_workspace/`、大容量・監査証跡）。成果物の `## 次のステップ参照` ブロックで段階間の判断の連続性を維持。
+- **Why 優先・DRY ポインタ** — 「ALWAYS／NEVER」の強制ではなく *理由* を説明（エッジケースの判断力↑）、単一の出典を参照（重複禁止）。
+
+> 一言で言えば：**オーケストレーター** が誰が／いつ／順序を決め、**エージェント** が誰が、**スキル** がどのように、**2 層ゲート** が品質を守る。
+
+### 7 ステップワークフロー
 
 ```
-Build a harness for this project
-Design an agent team for this domain
-Set up a harness
+Phase 0  現状監査 (既存ハーネスの drift 点検 · 新規/拡張/保守/更新へ分岐)
+Phase 1  ドメイン分析 (作業タイプ · 既存資産との衝突 · ユーザー習熟度の検知)
+Phase 2  チームアーキテクチャ設計 (実行モード + 6 パターンから選択)
+Phase 3  エージェント定義の生成 (.claude/agents/ · 教義の注入)
+Phase 4  スキルの生成 (.claude/skills/ · Progressive Disclosure)
+Phase 5  統合・オーケストレーション (+ 2 層品質ゲート · デュアルランタイム出力 · CLAUDE.md ポインタ)
+Phase 6  検証・テスト (トリガー検証 · ドライラン · with/without 比較)
+Phase 7  ハーネスの進化 (フィードバック還流 · ランタイム同期 · ビルド済みハーネスの更新)
 ```
 
-### 実行モード
+> **まず読む：** `skills/myharness/references/factory-map.md` — ドメイン／リスク別の最小経路マップ。**基本はスリム** — 外部レビュー・TDD・評価はリスクが上がったときだけ有効化します（単純なハーネスへの過負担を防止）。
 
-| モード | 説明 | 推奨ケース |
-|--------|------|------------|
-| **Agent Teams**（デフォルト） | Agent ツール（teammate spawn） + SendMessage + TaskCreate | エージェント2名以上、コラボレーションが必要な場合 |
-| **サブエージェント** | Agentツール直接呼び出し | 単発タスク、エージェント間通信不要の場合 |
+## 実行モード & アーキテクチャパターン
+
+| 実行モード | ツール | 適する場面 |
+|-----------|------|------|
+| **エージェントチーム**（基本） | `Agent`（チームメンバー spawn）+ `SendMessage` + `TaskCreate` | 2 名以上の協業、リアルタイムの調整・フィードバック |
+| **サブエージェント** | `Agent` ツールの直接呼び出し（`run_in_background` で並列） | 単発、エージェント間通信が不要 |
+| **ハイブリッド** | Phase ごとにチーム／サブを混合 | 段階ごとに特性が異なるとき |
 
 <p align="center">
-  <img src="harness_team.png" alt="Harness Agent Team" width="500">
+  <img src="harness_team.png" alt="myharness エージェントチーム" width="500">
 </p>
 
-### アーキテクチャパターン
+| アーキテクチャパターン | 説明 |
+|---------------|------|
+| パイプライン | 順次依存するタスク |
+| ファンアウト／ファンイン | 並列の独立タスクの後に統合 |
+| エキスパートプール | 状況別に選択して呼び出し |
+| 生成-検証 | 生成後に品質検収（リトライループ） |
+| スーパーバイザー | 中央エージェントが動的にタスクを分配 |
+| 階層的委譲 | 上位→下位への再帰的委譲 |
 
-| パターン | 説明 |
-|----------|------|
-| パイプライン | 順次依存タスク |
-| ファンアウト/ファンイン | 並列独立タスク |
-| エキスパートプール | 状況に応じた選択的呼び出し |
-| プロデューサー-レビューア | 生成後の品質レビュー |
-| スーパーバイザー | 中央エージェントによる動的タスク分配 |
-| 階層的委任 | 上位→下位への再帰的委任 |
-
-## 出力
-
-Harnessが生成するファイル：
+## 生成される成果物
 
 ```
 your-project/
 ├── .claude/
-│   ├── agents/          # エージェント定義ファイル
-│   │   ├── analyst.md
-│   │   ├── builder.md
-│   │   └── qa.md
-│   └── skills/          # スキルファイル
-│       ├── analyze/
-│       │   └── SKILL.md
-│       └── build/
-│           ├── SKILL.md
-│           └── references/
+│   ├── agents/          # エージェント定義 (analyst.md, builder.md, qa.md …)
+│   └── skills/          # スキル (各 SKILL.md + references/)
+├── CLAUDE.md            # Claude Code エントリポインタ
+└── AGENTS.md            # Codex エントリポインタ (デュアルランタイム時)
 ```
 
-## ユースケース — そのまま使えるプロンプト
+> **デュアルランタイム出力：** Codex も対象なら `.agents/skills/<name>/`・`.codex/agents/<name>.toml` を `.claude/` の成果物とともに出力（同じ正本）。詳細：`skills/myharness/references/runtime-adapters.md`。
 
-Harnessインストール後、以下のプロンプトをClaude Codeにコピーしてお使いください：
+## デュアルランタイム (Claude Code + Codex)
+
+正本（スキル本文・references・スクリプト）は **ランタイム非依存のマークダウン** です。アダプターで分岐するところだけが異なります：
+
+| 関心事 | Claude Code | Codex CLI |
+|--------|-------------|-----------|
+| エントリポイント | `.claude-plugin/plugin.json` + `CLAUDE.md` | `AGENTS.md`（自動ロード） |
+| スキル | `.claude/skills/` | `.agents/skills/`（フォーマット同一） |
+| エージェント | `.claude/agents/*.md` | `.codex/agents/*.toml` + 内蔵 worker/explorer |
+| オーケストレーション | `Agent` チームメンバー spawn + `SendMessage` + `TaskCreate` | ネイティブ subagents / `codex exec` subprocess |
+| 外部レビュアー | codex + agy（ランナー claude を除外） | claude + agy（ランナー codex を除外） |
+
+> `agy`（antigravity、Gemini モデル）はホストランタイムではなく、外部レビュー専用です。詳細：`skills/myharness/references/runtime-adapters.md`。
+
+## 使用例のプロンプト
+
+インストール後、Claude Code（または Codex）にそのまま貼り付けて試してみてください：
 
 **ディープリサーチ**
 ```
-Build a harness for deep research. I need an agent team that can investigate
-any topic from multiple angles — web search, academic sources, community
-sentiment — then cross-validate findings and produce a comprehensive report.
+ディープリサーチ用のハーネスを構成して。Web 検索・学術資料・コミュニティの世論など複数の角度から
+トピックを調査し、クロスチェックした上で総合レポートを出すエージェントチームが必要。
 ```
 
-**ウェブサイト制作**
+**フルスタック Web 開発**
 ```
-Build a harness for full-stack website development. The team should handle
-design, frontend (React/Next.js), backend (API), and QA testing in a
-coordinated pipeline from wireframe to deployment.
-```
-
-**ウェブトゥーン制作**
-```
-Build a harness for webtoon episode production. I need agents for story
-writing, character design prompts, panel layout planning, and dialogue
-editing. They should review each other's work for style consistency.
+フルスタック Web 開発用のハーネスを作って。デザイン・フロント(React/Next.js)・バックエンド(API)・QA が
+ワイヤーフレームからデプロイまでパイプラインで協業するチームがいい。
 ```
 
-**YouTube コンテンツ企画**
+**Webtoon 制作**
 ```
-Build a harness for YouTube content creation. The team should research
-trending topics, write scripts, optimize titles/tags for SEO, and plan
-thumbnail concepts — all coordinated by a supervisor agent.
-```
-
-**コードレビュー**
-```
-Build a harness for comprehensive code review. I want parallel agents
-checking architecture, security vulnerabilities, performance bottlenecks,
-and code style — then merging all findings into a single report.
+Webtoon エピソード制作用のハーネス。ストーリー・キャラクタープロンプト・パネルレイアウト・セリフ編集のエージェントが
+必要で、互いの結果をスタイル一貫性の観点でレビューさせて。
 ```
 
-**技術ドキュメント作成**
+**コードレビュー & リファクタリング**
 ```
-Build a harness that generates API documentation from this codebase.
-Agents should analyze endpoints, write descriptions, generate usage
-examples, and review for completeness.
+総合コードレビュー用のハーネス。アーキテクチャ・セキュリティ脆弱性・性能ボトルネック・コードスタイルを並列で点検した上で、
+すべての発見を 1 つのレポートに統合するチームが欲しい。
 ```
 
 **データパイプライン設計**
 ```
-Build a harness for designing data pipelines. I need agents for schema
-design, ETL logic, data validation rules, and monitoring setup that
-delegate sub-tasks hierarchically.
+データパイプライン設計用のハーネス。スキーマ設計・ETL ロジック・検証ルール・モニタリング設定を
+階層的に委譲するエージェントチームが必要。
 ```
 
-**マーケティングキャンペーン**
+## プラグイン構造
+
 ```
-Build a harness for marketing campaign creation. The team should research
-the target market, write ad copy, design visual concepts, and set up
-A/B test plans with iterative quality review.
+my_harness/
+├── .claude-plugin/plugin.json   # マニフェスト (name: myharness)
+├── skills/myharness/
+│   ├── SKILL.md                 # メインスキル (7 ステップワークフロー)
+│   ├── references/              # factory-map · agent-design-patterns · orchestrator-template ·
+│   │                            #   external-review-loop · tdd-doctrine · dev-rules ·
+│   │                            #   runtime-adapters · harness-update · loop-self-eval など
+│   └── scripts/                 # check-review-tools · build-scorecard · harness-update
+├── AGENTS.md                    # Codex エントリポイント
+├── install.sh                   # デュアルランタイムのインストール
+└── README.md / README_KO.md / README_JA.md
 ```
 
-## 共存 — Harness と隣人たち
+## エコシステム内の位置づけ
 
-Harness は Claude Code / エージェントフレームワークのエコシステムで一人ではありません。以下のリポジトリは隣接する層に位置しており、いずれも「X は ···、Harness は ···」という並列構造で記述されているため、用途に応じて選んだり、複数を組み合わせて利用できます。
+myharness は Claude Code エージェントエコシステムの **メタファクトリー** レイヤー — 他のハーネスを *生成する* 側 — に位置します。隣接するレイヤーとは役割が異なるため、選んで使うことも組み合わせることもできます。
 
-| リポジトリ | 相手のポジション | Harness との関係 |
-|------------|------------------|------------------|
-| [coleam00/Archon](https://github.com/coleam00/Archon) | "harness builder" — 決定的で再現可能なランタイム構成 | **同じ L3、隣のサブ層。** Archon は Runtime-Configuration Factory、Harness は Team-Architecture Factory。ランタイム決定性は Archon、チームアーキテクチャは Harness、または両者の組み合わせ。 |
-| [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) | 同一コンセプトの Codex 移植 | **同じ L3、異なるランタイム。** Claude Code では Harness、Codex では meta-harness。 |
-| [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) | "Agent harness performance & workflow layer" — 既存ハーネスの上に乗る標準化層 | **異なる層。** ECC は複数ハーネスの上の標準化層、Harness はハーネスを生成するファクトリー。直列的に組み合わせ可能。 |
-| [wshobson/agents](https://github.com/wshobson/agents) | サブエージェント / スキルカタログ (182 agents, 149 skills) | **ファクトリー ↔ 部品供給。** wshobson は「ショッピングするカタログ」、Harness は「チーム設計」。Harness が生成したチーム内に wshobson のエントリを部品として取り込み可能。 |
-| [LangGraph](https://langchain-ai.github.io/langgraph/) | ステートグラフ・オーケストレーション、LLM-agnostic | **異なるトラック。** 長時間実行・状態復元が要なら LangGraph、Claude Code ネイティブでの素早いチーム設計が要なら Harness。 |
-
-## Harnessで構築されたプロジェクト
-
-### Harness 100
-
-**[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 10ドメイン、100のプロダクションレディなエージェントチームハーネス（英韓200パッケージ）。各ハーネスには4〜5名の専門エージェント、オーケストレータースキル、ドメイン特化スキルが含まれており、すべて本プラグインで生成されました。コンテンツ制作、ソフトウェア開発、データ/AI、ビジネス戦略、教育、法律、ヘルスケアなど1,808のMarkdownファイル。
+| 隣接 | 相手の役割 | myharness との関係 |
+|------|----------|-------------------|
+| [coleam00/Archon](https://github.com/coleam00/Archon) | 決定論的・再現可能な **ランタイム構成** ファクトリー | 同じメタレイヤー、異なるサブ領域。Archon＝ランタイムの決定性、myharness＝チームアーキテクチャ。組み合わせ可能（設計は myharness → デプロイは Archon） |
+| [LangGraph](https://langchain-ai.github.io/langgraph/) | 状態グラフのオーケストレーション、LLM 非依存 | 異なるトラック。LangGraph＝長時間実行・状態復旧、myharness＝Claude Code ネイティブの高速なチーム設計 |
+| [wshobson/agents](https://github.com/wshobson/agents) | サブエージェント／スキルのカタログ | 部品供給 ↔ ファクトリー。カタログから部品を選び、myharness が設計したチームに取り込む |
 
 ## 要件
 
-- [Agent Teams機能の有効化](https://code.claude.com/docs/en/agent-teams)：`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- **Claude Code：** [エージェントチームの有効化](https://code.claude.com/docs/en/agent-teams) — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- **外部レビュー（任意）：** `codex`／`claude`／`agy` CLI のうち、ランナーを除いた 1 つ以上（`agy` がなければ `gemini` legacy フォールバック、すべて無ければゲート自動スキップ）
+
+> **⚠️ コスト注意：** エージェントチームはチームメンバーごとに独立した Claude インスタンスのため、並列／共有コンテキストの構造上 **単一プロンプトと比べて API トークンコストが急増** することがあります。コストに敏感な環境ではサブエージェントモードを使う（`run_in_background` の結果のみ返す）か、エージェントチームを無効化してください。myharness はモデルルーティング・並行性 cap・外部レビュー予算でこれを緩和します。
+>
+> **既知の制限（experimental）：** エージェントチームは Claude Code の実験的機能です。`--resume` 未復元、task status の遅延、tmux モードのゾンビプロセスなどの制限があるため — myharness は中間成果物を `_workspace/` にチェックポイントとして残し、完了報告を `SendMessage` で要求し、終了時には明示的な shutdown を求めるよう設計します。詳細：`skills/myharness/references/agent-design-patterns.md`。
 
 ## FAQ
 
 <details>
-<summary><b>Q1. なぜ "harness builder" ではなく "harness factory" なのですか？ Archon と競合しませんか？</b></summary>
+<summary><b>Q1. どのランタイムをサポートしていますか？</b></summary>
 
-**A.** Archon は決定的なランタイム構成を生成する **Runtime-Configuration Factory** であり、Harness はエージェントチームアーキテクチャ（チーム構造・メッセージプロトコル・レビューゲート）を生成する **Team-Architecture Factory** です。両者は **同じ L3 Meta-Factory 層の隣接するサブ層** で、用途が異なります。決定的なランタイムが必要なら Archon、6 つのチームアーキテクチャパターンの事前定義が必要なら Harness。両者を組み合わせる（アーキテクチャ設計 → ランタイム配置）ことも可能です。
-
-**Evidence:**
-- Archon 自己定義: [clawfit docs/reference-levels.md](https://github.com/hongsw/clawfit/blob/main/docs/reference-levels.md)
-- サブ層宣言: 本 README の **カテゴリー — Harness はどこに位置するか** セクション
-- Archon リポジトリ: [github.com/coleam00/Archon](https://github.com/coleam00/Archon)
+**A.** Claude Code と Codex の両方（デュアルランタイム）。単一の正本（`skills/myharness/`）+ ランタイム別の薄いアダプター。Claude Code が最も自動化された主ランタイム（`Agent` チームメンバー spawn）、Codex は `AGENTS.md` + `.agents/skills/` + ネイティブ subagents / `codex exec` でサポート（`$myharness` または `/skills`）。Gemini はホストではなく外部レビュアー（agy 経由）としてのみ使用。詳細：`skills/myharness/references/runtime-adapters.md`。
 </details>
 
 <details>
-<summary><b>Q2. どのランタイムをサポートしますか — Claude Code、Codex？</b></summary>
+<summary><b>Q2. すべての作業で重いゲートが全部有効になりますか？</b></summary>
 
-**A.** 両方。myharness は **デュアルランタイム**：単一の出典（`skills/myharness/`）＋ランタイム別の薄いアダプター。Claude Code が主（最も自動化 — `Agent` ツールのエージェントチーム）、Codex は `AGENTS.md`＋`.agents/skills/`＋ネイティブ subagents / `codex exec` で対応（`$myharness` または `/skills` で呼び出し）。詳細：`skills/myharness/references/runtime-adapters.md`。Gemini はホストランタイムではなく外部レビュー（agy 経由）のレビュアーとして使用。
+**A.** いいえ。**基本はスリム** です。単純／非コード／可逆な作業は内部 QA のみ、コード／設計の標準は外部レビュー 1 回、契約変更・不可逆な重大作業のみ各段階で外部レビュー + 承認ラダー。リスク等級で強度を合わせます（`skills/myharness/references/factory-map.md`）。
+</details>
+
+<details>
+<summary><b>Q3. ファクトリーを更新すると、自分で手を入れたハーネスが上書きされますか？</b></summary>
+
+**A.** いいえ。`/myharness update` は `.harness-manifest.json` のハッシュでファイルを分類し、USER-MODIFIED は **保留**（明示的に承認したときのみ置換、部分マージなし）します。ユーザーのポリシーは `*.local.*` ファイルに分離すれば更新も安全。詳細：`skills/myharness/references/harness-update.md`。
 </details>
 
 ## ライセンス

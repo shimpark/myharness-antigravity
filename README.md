@@ -1,313 +1,260 @@
 <p align="center">
-  <img src="harness_banner.png" alt="Harness Banner" width="600">
+  <img src="harness_banner.png" alt="myharness Banner" width="600">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-1.1.1-brightgreen.svg" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
+  <img src="https://img.shields.io/badge/Runtime-Claude_Code_+_Codex-blueviolet.svg" alt="Dual Runtime">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
-  <img src="https://img.shields.io/badge/Mode-Agent_Teams-green.svg" alt="Agent Teams">
+  <img src="https://img.shields.io/badge/Quality_Gate-2--Layer-green.svg" alt="Two-Layer Quality Gate">
   <a href="https://github.com/cookyman74/my_harness/stargazers"><img src="https://img.shields.io/github/stars/cookyman74/my_harness?style=social" alt="GitHub Stars"></a>
 </p>
 
-<p align="center">
-  <a href="#category--where-harness-sits"><img src="https://img.shields.io/badge/Layer-L3%20Meta--Factory-orange" alt="Layer"></a>
-  <a href="#category--where-harness-sits"><img src="https://img.shields.io/badge/Sub--layer-Team--Architecture%20Factory-teal" alt="Sub-layer"></a>
-  <a href="#"><img src="https://img.shields.io/badge/README-EN%20%7C%20KO%20%7C%20JA-lightgrey" alt="i18n"></a>
-</p>
-
-# Harness — The Team-Architecture Factory for Claude Code
+# myharness — The Agent-Team Architecture Factory
 
 **English** | [한국어](README_KO.md) | [日本語](README_JA.md)
 
-> **Harness is a team-architecture factory for Claude Code.** Say **"build a harness for this project"** (English) or **"하네스 구성해줘"** (한국어) or **"ハーネスを構成して"** (日本語), and the plugin turns your domain description into an agent team and the skills they use — picked from six pre-defined team-architecture patterns.
+> **myharness is a Claude Code · Codex dual-runtime factory that turns a single sentence about your domain into an agent team and skills.**
+> Just say `"Build a harness for this project"` — it analyzes your domain and stamps out specialized agent definitions (`.claude/agents/`) and skills (`.claude/skills/`), picking whichever of the 6 team architecture patterns fits.
 
-## Overview
+---
 
-Harness leverages Claude Code's agent team system to decompose complex tasks into coordinated teams of specialized agents. Say "build a harness for this project" and it automatically generates agent definitions (`.claude/agents/`) and skills (`.claude/skills/`) tailored to your domain.
+## What is myharness?
 
-## Category — Where Harness Sits
+When you tackle a complex job with one giant prompt, context gets polluted, the same blind spots repeat, and nothing is reusable. myharness decomposes that job and generates it as **a team of specialized agents with separated roles + skills that carry the procedures + an orchestrator that weaves them together**.
 
-Harness lives at the **L3 Meta-Factory** layer of the Claude Code ecosystem — the layer that generates other harnesses rather than being one. Inside L3, we pick a specific sub-layer: **Team-Architecture Factory**.
+- **Input:** a single sentence about your domain (e.g., "deep research", "full-stack web development", "code review")
+- **Output:** agent definitions + skills + an orchestrator skill + entry pointers (`CLAUDE.md`/`AGENTS.md`)
+- **Characteristics:** Korean-first · slim by default (gates tighten only as risk rises) · outputs for both Claude Code and Codex
 
-| Layer | What it does | Neighbors we coexist with |
-|-------|--------------|---------------------------|
-| **L3 — Meta-Factory / Team-Architecture Factory** (us) | Domain sentence → agent team + skills, via 6 pre-defined team patterns | — |
-| L3 — Meta-Factory / Runtime-Configuration Factory | Deterministic, repeatable runtime configurations | [coleam00/Archon](https://github.com/coleam00/Archon) |
-| L3 — Meta-Factory / Codex Runtime Port | Same concept, Codex runtime | [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) |
-| L2 — Cross-Harness Workflow | Standardize skills/rules/hooks across multiple harnesses | [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) |
+myharness itself is a meta skill (plugin), and it treats itself as **a system that evolves** — it feeds execution feedback back into the appropriate layer (skill/agent/orchestrator) and leaves a change history.
 
-> Archon generates deterministic runtime configurations. Harness generates team architectures (pipeline, fan-out/fan-in, expert pool, producer-reviewer, supervisor, hierarchical delegation) plus the skills agents use. Different sub-layers of the same L3. Pick Archon for runtime determinism, Harness for team architecture, or combine them.
+## Quick Start
 
-## Key Features
+### 1. Install (pick one)
 
-- **Agent Team Design** — 6 architectural patterns: Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, and Hierarchical Delegation
-- **Skill Generation** — Auto-generates skills with Progressive Disclosure for efficient context management
-- **Orchestration** — Inter-agent data passing, error handling, and team coordination protocols
-- **Validation** — Trigger verification, dry-run testing, and with-skill vs without-skill comparison tests
-- **Two-Layer Quality Gate** — Internal Producer-Reviewer QA **plus** an external independent review loop (`external-review-loop`): independent reviewer CLIs review each stage's deliverable, the orchestrator adjudicates every issue against real code (confirm/partial/defer/reject), and only confirmed issues are fixed via TDD. Reviewers are chosen for **engine diversity** — the runner's own engine is excluded so an AI never reviews its own blind spots (Claude Code → codex + agy; Codex → claude + agy). It is a **convergent loop** — loop-until-dry with a round cap, a verdicts ledger (dedup vs seen) so rejected issues don't resurface, and re-review of its own fixes. Tool availability is checked first (`check-review-tools.sh`, emitting the runner-excluded `REVIEWERS:` set) so skill generation is skipped when no external reviewer is available.
-- **Loop Self-Evaluation** — each loop emits a `loop_scorecard.json` (alignment_score, verdict counts, normalized rounds, cost, termination label) for a staged self-improvement path (measure → manual report → propose → auto), with anti-Goodhart guards (propose-only + approval, rolling window, min-samples; recall measured only against ground truth). See `references/loop-self-eval.md`.
-- **Doctrine Injection** — Generated code/modification agents get TDD (`tdd-doctrine.md`) and development-rules (`dev-rules.md`) doctrine injected by real path, with risk-tiered gate strength (light / standard / critical).
-- **Dual Runtime (Claude Code + Codex)** — One source of truth (`skills/myharness/`), thin per-runtime adapters. The factory emits both `CLAUDE.md` and `AGENTS.md` pointers and adapts orchestration (Claude agent teams via the `Agent` tool ↔ Codex native subagents / `codex exec`), with a Phase-7 runtime-sync step to prevent drift. See `references/runtime-adapters.md`.
-- **Built-Harness Update (Claude `/myharness update` · Codex `$myharness update`)** — After a plugin update, re-propagates factory doctrine/scripts to an already-built harness while **protecting your local edits from being overwritten**. A `.harness-manifest.json` baseline (recorded at generation) lets `harness-update.sh` classify each file by hash — SAME / UPDATABLE (auto) / USER-MODIFIED (held back; overwritten with canonical only on explicit approval, no partial merge) / UNKNOWN (conservative, manifest missing) / NEW. Add your own rules in a `*.local.*` file to stay update-safe. See `references/harness-update.md`.
-- **Cost & Concurrency Control** — model routing (high-reasoning → `opus`, simple tasks → light models), concurrency caps with backpressure (default 3 / max 5), external-review budget (skip-when-no-delta, `.fast-pass`), and smoke/full test modes keep large fan-outs affordable. Portable tooling (`timeout`/`gtimeout` detection, process cleanup).
-
-
-## Philosophy — Skill ↔ Agent
-
-A generated harness separates **who** from **how**, and treats itself as an evolving system:
-
-- **Separation of concerns** — an *agent* is the "who" (expert persona + working principles), a *skill* is the "how" (procedure + bundled tools). Both are files (`.claude/agents/*.md`, `skills/*/SKILL.md`), never inline — reusable across sessions. One agent = one focused role; one agent uses 1–N skills (sharing allowed).
-- **Agent teams by default** — 2+ collaborators self-coordinate via messages, a shared task list, and files under `_workspace/`. Discovery-sharing, conflict debate, and gap-filling raise quality.
-- **Two-layer quality gate** — internal Producer-Reviewer QA **plus** an external independent review loop (engine-diverse reviewers, runner engine excluded). The orchestrator adjudicates every issue against real code — consensus is not proof. Gate strength is risk-tiered (light / standard / critical).
-- **Doctrine injection** — code/modification agents receive TDD (`tdd-doctrine.md`) and development-rules (`dev-rules.md`) doctrine by real path (subagents don't inherit global rules).
-- **Why over command, DRY pointers** — principles explain *why* (so agents judge edge cases) and reference a single source instead of duplicating it.
-- **Evolving system** — feedback routes to the right layer (output → skill, role → agent, order → orchestrator, trigger → description) and is logged for regression safety.
-
-> In short: the **orchestrator** decides who/when/order, **agents** are the *who*, **skills** are the *how*, and a two-layer gate keeps quality honest.
-
-## Workflow
-
-```
-Phase 1: Domain Analysis
-    ↓
-Phase 2: Team Architecture Design (Agent Teams vs Subagents)
-    ↓
-Phase 3: Agent Definition Generation (.claude/agents/)
-    ↓
-Phase 4: Skill Generation (.claude/skills/)
-    ↓
-Phase 5: Integration & Orchestration (+ two-layer quality gate, dual-runtime output)
-    ↓
-Phase 6: Validation & Testing
-    ↓
-Phase 7: Harness Evolution (feedback → continuous update; dual-runtime sync)
-```
-
-## Installation
-
-### Via Marketplace
-
-#### Add the marketplace
+**Marketplace (recommended)**
 ```shell
 /plugin marketplace add cookyman74/my_harness
-```
-
-#### Install the plugin
-```shell
 /plugin install myharness@myharness-marketplace
 ```
 
-### Direct Installation as Global Skill
-
+**Copy directly as a global skill**
 ```shell
-# Copy the skills directory to ~/.claude/skills/myharness/
 cp -r skills/myharness ~/.claude/skills/myharness
 ```
 
-### Codex CLI (Dual Runtime)
-
-Codex discovers skills from `~/.codex/skills/` (user-global) — and skills load even in untrusted projects. The repo's `install.sh` symlinks the live factory and verifies review tools:
-
+**Codex CLI (dual runtime)** — from the repo root:
 ```shell
 bash install.sh
-# → ~/.codex/skills/myharness → skills/myharness (symlink, always latest)
-# → repo .agents/skills/myharness (for trusted projects)
-# → AGENTS.md (auto-loaded by Codex)
+# → ~/.codex/skills/myharness  (symlink to the source of truth, always up to date)
+# → .agents/skills/myharness   (for trusted projects)
+# → AGENTS.md                  (auto-loaded by Codex)
 ```
 
-Invoke in Codex with **`$myharness`**, the **`/skills`** menu, or a description-matching request (e.g. "하네스 구성해줘"). Note: `/myharness` is **not** valid Codex syntax (custom slash commands are unsupported); restart the Codex session after install so the skill list reloads.
+### 2. Turn on agent teams + start the CLI (Claude Code)
+```shell
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+claude   # start the Claude Code CLI (for Codex, use the codex command)
+```
+
+### 3. Triggers
+- **Claude Code:** `Build a harness for this project` · `/myharness` · `Design an agent team for this domain`
+- **Codex:** `$myharness` · the `/skills` menu · `Build a harness` (description matching). A session restart after install is recommended. (Codex doesn't support custom slash commands — `/myharness` is unavailable.)
+
+> Copy-paste examples by domain → [Example Prompts](#example-prompts)
+
+## Core Features
+
+| Feature | Details |
+|---------|---------|
+| **6 team architectures** | Pipeline · Fan-out/Fan-in · Specialist pool · Generate-and-verify · Supervisor · Hierarchical delegation. Picks the pattern that fits the domain |
+| **Agent teams by default** | Spawn teammates with the `Agent` tool, communicate directly via `SendMessage`, and self-coordinate through a shared task list (`TaskCreate`). Quality rises through shared findings and debating disagreements |
+| **Automatic skill generation** | Progressive Disclosure (staged loading: metadata → body → references) for context efficiency. Trigger descriptions are written aggressively |
+| **Two-layer quality gate** | Internal generate-and-verify QA **+** an external independent review loop. Details below |
+| **Doctrine injection** | Injects TDD (`tdd-doctrine.md`) and dev rules (`dev-rules.md`) into the working principles of coding/editing agents via **real paths**. Risk tiers (light/standard/critical) tune gate strength |
+| **Dual runtime** | A single source of truth (`skills/myharness/`) + a thin per-runtime adapter. Outputs both `CLAUDE.md` and `AGENTS.md`, with orchestration branching (Claude spawns `Agent` teammates ↔ Codex native subagents / `codex exec`). Phase 7 synchronization prevents drift |
+| **Built-harness update** | `/myharness update` (Codex `$myharness update`) — re-propagates the factory source of truth into an already-built harness while **protecting local edits**. `.harness-manifest.json` hash classification (SAME/auto/USER-MODIFIED held/NEW), with `*.local.*` keeping updates safe |
+| **Cost & concurrency control** | Model routing (high-reasoning → `opus`, simple → lightweight), a concurrency cap (default 3 / max 5) with backpressure, an external-review budget (skips when there's no change), and smoke/full test modes to keep large fan-out costs under control |
+| **Loop self-evaluation** | Each loop produces a `loop_scorecard.json` (alignment · verdict distribution · normalization rounds · cost). **Currently only the measurement logging is active**; the suggest → automatic loopback is experimental. anti-Goodhart guards (against metric gaming and overfitting) |
+
+### Two-Layer Quality Gate (code/design domains)
+
+Internal QA runs in the same session and the same context, so it shares the **same blind spots**. That's why an external independent AI review is placed on a separate axis.
+
+- **Engine diversity** — reviewers are chosen by **excluding** the runner engine (same engine = same blind spots). When running on Claude Code, `codex`+`agy`; when running on Codex, `claude`+`agy`. (`agy` = a Gemini model)
+- **Direct verdict on every item** — external reviewers don't know the design decisions, frozen contracts, or actual measurements, so the orchestrator judges every reported issue against **the real code** as confirmed/partial/deferred/rejected. Consensus is not the answer; verdict authority stays with the orchestrator (no delegation).
+- **Convergence loop** — loop-until-dry (zero new issues for K consecutive rounds) + a round cap, a verdict ledger (`verdicts.json`, prevents reappearance), and re-review of the fix. Only confirmed items are fixed via TDD.
+- **Skip when tools are absent** — `check-review-tools.sh` produces a runner-excluded `REVIEWERS:` list; if no external reviewer exists, the gate shrinks to internal QA (avoids a non-functional skill).
+
+> This README is verified through that gate too — committed after an external audit by `codex` (consistency) + `agy` (performance & stability).
+
+## How It Works — Skills ↔ Agents
+
+A generated harness separates **who** from **how**:
+
+- **Agent = who** — an expert persona + working principles. Defined as a `.claude/agents/{name}.md` file (no inlining → reusable across sessions). 1 agent = 1 role.
+- **Skill = how** — procedures + bundled tools. `skills/{name}/SKILL.md`. One agent uses 1–N skills (shareable).
+- **Orchestrator = who, when, in what order** — weaves individual agents/skills into a single workflow.
+- **Data passing** — messages (real-time coordination) + a shared task list (progress tracking) + files (`_workspace/`, large payloads & audit trail). Result documents keep judgment continuous across stages via a `## Next-step reference` block.
+- **Why-first · DRY pointers** — instead of forcing "ALWAYS/NEVER", explain the *why* (sharpens judgment on edge cases) and reference a single source (no duplication).
+
+> In short: the **orchestrator** decides who/when/order, the **agents** are the who, the **skills** are the how, and the **two-layer gate** protects quality.
+
+### 7-Phase Workflow
+
+```
+Phase 0  Status audit (check existing harness for drift · branch into new/extend/maintain/update)
+Phase 1  Domain analysis (task type · conflicts with existing assets · detect user skill level)
+Phase 2  Team architecture design (execution mode + choice among the 6 patterns)
+Phase 3  Generate agent definitions (.claude/agents/ · doctrine injection)
+Phase 4  Generate skills (.claude/skills/ · Progressive Disclosure)
+Phase 5  Integration & orchestration (+ two-layer quality gate · dual-runtime output · CLAUDE.md pointers)
+Phase 6  Validation & testing (trigger verification · dry run · with/without comparison)
+Phase 7  Harness evolution (feedback loopback · runtime synchronization · built-harness update)
+```
+
+> **Read first:** `skills/myharness/references/factory-map.md` — a map of minimal paths by domain/risk. **Slim by default** — external review, TDD, and evaluation are turned on only as risk rises (avoids overburdening a simple harness).
+
+## Execution Modes & Architecture Patterns
+
+| Execution mode | Tools | Best for |
+|----------------|-------|----------|
+| **Agent team** (default) | `Agent` (spawn teammates) + `SendMessage` + `TaskCreate` | 2+ collaborators, real-time coordination & feedback |
+| **Sub-agents** | Direct `Agent` tool calls (`run_in_background` for parallelism) | One-off work, no inter-agent communication needed |
+| **Hybrid** | Mix team/sub per phase | When phases have different characteristics |
+
+<p align="center">
+  <img src="harness_team.png" alt="myharness Agent Team" width="500">
+</p>
+
+| Architecture pattern | Description |
+|----------------------|-------------|
+| Pipeline | Sequentially dependent tasks |
+| Fan-out/Fan-in | Parallel independent tasks, then merge |
+| Specialist pool | Selective invocation by situation |
+| Generate-and-verify | Generate, then quality-check (retry loop) |
+| Supervisor | A central agent distributes work dynamically |
+| Hierarchical delegation | Recursive top → bottom delegation |
+
+## Generated Output
+
+```
+your-project/
+├── .claude/
+│   ├── agents/          # agent definitions (analyst.md, builder.md, qa.md …)
+│   └── skills/          # skills (each SKILL.md + references/)
+├── CLAUDE.md            # Claude Code entry pointer
+└── AGENTS.md            # Codex entry pointer (when dual runtime)
+```
+
+> **Dual-runtime output:** If Codex is also a target, `.agents/skills/<name>/` and `.codex/agents/<name>.toml` are emitted alongside the `.claude/` output (same source of truth). Details: `skills/myharness/references/runtime-adapters.md`.
+
+## Dual Runtime (Claude Code + Codex)
+
+The source of truth (skill body · references · scripts) is **runtime-agnostic Markdown**. Only the adapter branching differs:
+
+| Concern | Claude Code | Codex CLI |
+|---------|-------------|-----------|
+| Entry point | `.claude-plugin/plugin.json` + `CLAUDE.md` | `AGENTS.md` (auto-loaded) |
+| Skills | `.claude/skills/` | `.agents/skills/` (same format) |
+| Agents | `.claude/agents/*.md` | `.codex/agents/*.toml` + built-in worker/explorer |
+| Orchestration | `Agent` teammate spawn + `SendMessage` + `TaskCreate` | native subagents / `codex exec` subprocess |
+| External reviewers | codex + agy (runner claude excluded) | claude + agy (runner codex excluded) |
+
+> `agy` (antigravity, a Gemini model) is not a host runtime — it's dedicated to external review only. Details: `skills/myharness/references/runtime-adapters.md`.
+
+## Example Prompts
+
+After install, paste these straight into Claude Code (or Codex):
+
+**Deep research**
+```
+Build a harness for deep research. I need an agent team that investigates a topic from
+multiple angles — web search, academic sources, community sentiment — then cross-verifies
+and produces a comprehensive report.
+```
+
+**Full-stack web development**
+```
+Build a harness for full-stack web development. I'd like a team where design · frontend
+(React/Next.js) · backend (API) · QA collaborate as a pipeline from wireframe to deployment.
+```
+
+**Webtoon production**
+```
+A harness for producing webtoon episodes. I need agents for story · character prompts ·
+panel layout · dialogue editing, and have them review each other's output for style consistency.
+```
+
+**Code review & refactoring**
+```
+A harness for comprehensive code review. I want a team that checks architecture · security
+vulnerabilities · performance bottlenecks · code style in parallel, then merges every finding
+into a single report.
+```
+
+**Data pipeline design**
+```
+A harness for data pipeline design. I need an agent team that hierarchically delegates
+schema design · ETL logic · validation rules · monitoring setup.
+```
 
 ## Plugin Structure
 
 ```
 my_harness/
-├── .claude-plugin/
-│   └── plugin.json                 # Plugin manifest (name: myharness)
-├── skills/
-│   └── myharness/
-│       ├── SKILL.md                # Main skill definition (7-Phase workflow)
-│       ├── references/
-│       │   ├── factory-map.md             # Navigation: minimal path · impl status · loop map (read first)
-│       │   ├── agent-design-patterns.md   # 6 architectural patterns
-│       │   ├── orchestrator-template.md   # Team/subagent/Codex orchestrator templates
-│       │   ├── team-examples.md           # Real-world team configurations
-│       │   ├── skill-writing-guide.md     # Skill authoring guide
-│       │   ├── skill-testing-guide.md     # Testing & evaluation methodology
-│       │   ├── qa-agent-guide.md          # QA agent integration guide
-│       │   ├── external-review-loop.md    # external review gate, engine-diverse (convergent loop + template)
-│       │   ├── loop-self-eval.md          # loop scorecard (measure-only; stages 3-4 experimental)
-│       │   ├── self-improvement-loop.md   # benchmark-anchored artifact improvement (design only)
-│       │   ├── tdd-doctrine.md            # TDD doctrine (injected into code agents)
-│       │   ├── dev-rules.md               # Development rules (injected into code agents)
-│       │   ├── runtime-adapters.md        # Claude Code / Codex dual-runtime design
-│       │   └── harness-update.md          # built-harness update (preserve local edits)
-│       └── scripts/
-│           ├── check-review-tools.sh      # reviewer availability check (runner-excluded)
-│           ├── build-scorecard.sh         # compute loop_scorecard from verdicts
-│           └── harness-update.sh          # update built harness (manifest/plan/apply)
-├── AGENTS.md                       # Codex runtime entry point
-├── install.sh                      # Dual-runtime installer (Claude + Codex)
-└── README.md
+├── .claude-plugin/plugin.json   # manifest (name: myharness)
+├── skills/myharness/
+│   ├── SKILL.md                 # main skill (7-phase workflow)
+│   ├── references/              # factory-map · agent-design-patterns · orchestrator-template ·
+│   │                            #   external-review-loop · tdd-doctrine · dev-rules ·
+│   │                            #   runtime-adapters · harness-update · loop-self-eval, etc.
+│   └── scripts/                 # check-review-tools · build-scorecard · harness-update
+├── AGENTS.md                    # Codex entry point
+├── install.sh                   # dual-runtime install
+└── README.md / README_KO.md / README_JA.md
 ```
 
-## Usage
+## Where It Sits in the Ecosystem
 
-Trigger in Claude Code with prompts like:
+myharness lives at the **meta-factory** layer of the Claude Code agent ecosystem — the side that *generates* other harnesses. Its role differs from adjacent layers, so you can pick one or combine them.
 
-```
-Build a harness for this project
-Design an agent team for this domain
-Set up a harness
-```
-
-### Execution Modes
-
-| Mode | Description | Recommended For |
-|------|-------------|-----------------|
-| **Agent Teams** (default) | Agent tool (spawn teammates) + SendMessage + TaskCreate | 2+ agents requiring collaboration |
-| **Subagents** | Direct Agent tool invocation | One-off tasks, no inter-agent communication needed |
-
-<p align="center">
-  <img src="harness_team.png" alt="Harness Agent Team" width="500">
-</p>
-
-### Architecture Patterns
-
-| Pattern | Description |
-|---------|-------------|
-| Pipeline | Sequential dependent tasks |
-| Fan-out/Fan-in | Parallel independent tasks |
-| Expert Pool | Context-dependent selective invocation |
-| Producer-Reviewer | Generation followed by quality review |
-| Supervisor | Central agent with dynamic task distribution |
-| Hierarchical Delegation | Top-down recursive delegation |
-
-## Output
-
-Files generated by Harness:
-
-```
-your-project/
-├── .claude/
-│   ├── agents/          # Agent definition files
-│   │   ├── analyst.md
-│   │   ├── builder.md
-│   │   └── qa.md
-│   └── skills/          # Skill files
-│       ├── analyze/
-│       │   └── SKILL.md
-│       └── build/
-│           ├── SKILL.md
-│           └── references/
-├── CLAUDE.md            # Claude Code pointer
-└── AGENTS.md            # Codex pointer (dual-runtime)
-```
-
-> **Dual-runtime output:** when targeting Codex too, the factory also emits `AGENTS.md`, `.agents/skills/<name>/`, and `.codex/agents/<name>.toml` alongside the `.claude/` files (same source of truth). See `references/runtime-adapters.md`.
-
-## Use Cases — Try These Prompts
-
-Copy any prompt below into Claude Code after installing Harness:
-
-**Deep Research**
-```
-Build a harness for deep research. I need an agent team that can investigate
-any topic from multiple angles — web search, academic sources, community
-sentiment — then cross-validate findings and produce a comprehensive report.
-```
-
-**Website Development**
-```
-Build a harness for full-stack website development. The team should handle
-design, frontend (React/Next.js), backend (API), and QA testing in a
-coordinated pipeline from wireframe to deployment.
-```
-
-**Webtoon / Comic Production**
-```
-Build a harness for webtoon episode production. I need agents for story
-writing, character design prompts, panel layout planning, and dialogue
-editing. They should review each other's work for style consistency.
-```
-
-**YouTube Content Planning**
-```
-Build a harness for YouTube content creation. The team should research
-trending topics, write scripts, optimize titles/tags for SEO, and plan
-thumbnail concepts — all coordinated by a supervisor agent.
-```
-
-**Code Review & Refactoring**
-```
-Build a harness for comprehensive code review. I want parallel agents
-checking architecture, security vulnerabilities, performance bottlenecks,
-and code style — then merging all findings into a single report.
-```
-
-**Technical Documentation**
-```
-Build a harness that generates API documentation from this codebase.
-Agents should analyze endpoints, write descriptions, generate usage
-examples, and review for completeness.
-```
-
-**Data Pipeline Design**
-```
-Build a harness for designing data pipelines. I need agents for schema
-design, ETL logic, data validation rules, and monitoring setup that
-delegate sub-tasks hierarchically.
-```
-
-**Marketing Campaign**
-```
-Build a harness for marketing campaign creation. The team should research
-the target market, write ad copy, design visual concepts, and set up
-A/B test plans with iterative quality review.
-```
-
-## Coexistence — Harness and Neighbors
-
-Harness is not alone in the Claude Code / agent-framework ecosystem. The following repos live in adjacent layers; each is described in a parallel "X is …, Harness is …" form so you can pick the one that fits your need or combine several.
-
-| Repo | Their position | Relationship to Harness |
-|------|----------------|-------------------------|
-| [coleam00/Archon](https://github.com/coleam00/Archon) | "harness builder" — deterministic, repeatable runtime configurations | **Same L3, neighbor sub-layer.** Archon is a Runtime-Configuration Factory, Harness is a Team-Architecture Factory. Pick Archon for runtime determinism, Harness for team architecture, or combine them. |
-| [SaehwanPark/meta-harness](https://github.com/SaehwanPark/meta-harness) | Codex port of the same concept | **Same L3, different runtime.** Use Harness on Claude Code, meta-harness on Codex. |
-| [affaan-m/ECC](https://github.com/affaan-m/everything-claude-code) | "Agent harness performance & workflow layer" (sits on top of existing harnesses) | **Different layer.** ECC is a standardization layer across harnesses; Harness is a factory that generates harnesses. Serial combination possible. |
-| [wshobson/agents](https://github.com/wshobson/agents) | Subagent / skill catalog (182 agents, 149 skills) | **Factory ↔ parts supply.** wshobson is a catalog to shop from; Harness designs the team. Absorb wshobson entries as parts inside a Harness-generated team. |
-| [LangGraph](https://langchain-ai.github.io/langgraph/) | State-graph orchestration, LLM-agnostic | **Different track.** LangGraph is for long-running, state-recoverable orchestration; Harness is for fast Claude-Code-native team design. |
-
-## Built with Harness
-
-> The repos below belong to the **original upstream author** (`revfactory`) — kept as references to the original project, not part of this white-labeled fork.
-
-### Harness 100
-
-**[revfactory/harness-100](https://github.com/revfactory/harness-100)** — 100 production-ready agent team harnesses across 10 domains, available in both English and Korean (200 packages total). Each harness ships with 4-5 specialist agents, an orchestrator skill, and domain-specific skills — all generated by this plugin. 1,808 markdown files covering content creation, software development, data/AI, business strategy, education, legal, health, and more.
+| Neighbor | Their role | Relationship to myharness |
+|----------|------------|---------------------------|
+| [coleam00/Archon](https://github.com/coleam00/Archon) | A factory for deterministic, reproducible **runtime configuration** | Same meta layer, different sub-area. Archon = runtime determinism, myharness = team architecture. Combinable (design with myharness → deploy with Archon) |
+| [LangGraph](https://langchain-ai.github.io/langgraph/) | State-graph orchestration, LLM-agnostic | A different track. LangGraph = long-running & state recovery, myharness = fast, Claude Code-native team design |
+| [wshobson/agents](https://github.com/wshobson/agents) | A catalog of subagents/skills | Parts supply ↔ factory. Pick parts from the catalog and absorb them into the team myharness designs |
 
 ## Requirements
 
-- [Agent Teams enabled](https://code.claude.com/docs/en/agent-teams): `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- **Claude Code:** [enable agent teams](https://code.claude.com/docs/en/agent-teams) — `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`
+- **External review (optional):** at least one of the `codex`/`claude`/`agy` CLIs excluding the runner (if `agy` is missing it falls back to the legacy `gemini`; if none are present the gate is auto-skipped)
+
+> **⚠️ Cost warning:** In an agent team each teammate is an independent Claude instance, so by the nature of its parallel/shared-context structure the **API token cost can climb quickly compared to a single prompt**. In cost-sensitive environments, use sub-agent mode (returning only the `run_in_background` result) or turn agent teams off. myharness mitigates this with model routing, a concurrency cap, and an external-review budget.
+>
+> **Known limitations (experimental):** Agent teams are an experimental Claude Code feature. There are limitations such as no `--resume` restoration, task status lag, and zombie processes in tmux mode — so myharness is designed to checkpoint intermediate output into `_workspace/`, require completion reports via `SendMessage`, and request an explicit shutdown on exit. Details: `skills/myharness/references/agent-design-patterns.md`.
 
 ## FAQ
 
 <details>
-<summary><b>Q1. Why "harness factory" and not "harness builder"? Isn't this competing with Archon?</b></summary>
+<summary><b>Q1. Which runtimes are supported?</b></summary>
 
-**A.** Archon generates deterministic runtime configurations — it's a **Runtime-Configuration Factory**. Harness generates agent team architectures (team structure, message protocols, review gates) — it's a **Team-Architecture Factory**. They are **neighbor sub-layers of the same L3 Meta-Factory** and serve different needs. Pick Archon for runtime determinism, Harness for team-architecture patterns, or combine them (design architecture with Harness → deploy runtime with Archon).
-
-**Evidence:**
-- Archon self-definition: [clawfit docs/reference-levels.md](https://github.com/hongsw/clawfit/blob/main/docs/reference-levels.md)
-- Sub-layer declaration: see the **Category — Where Harness Sits** section above
-- Archon repo: [github.com/coleam00/Archon](https://github.com/coleam00/Archon)
+**A.** Both Claude Code and Codex (dual runtime). A single source of truth (`skills/myharness/`) + a thin per-runtime adapter. Claude Code is the most automated primary runtime (`Agent` teammate spawn); Codex is supported via `AGENTS.md` + `.agents/skills/` + native subagents / `codex exec` (`$myharness` or `/skills`). Gemini is not a host — it's used only as an external reviewer (via agy). Details: `skills/myharness/references/runtime-adapters.md`.
 </details>
 
 <details>
-<summary><b>Q2. Which runtimes are supported — Claude Code, Codex?</b></summary>
+<summary><b>Q2. Are the heavy gates all turned on for every task?</b></summary>
 
-**A.** Both. myharness is **dual-runtime**: one source of truth (`skills/myharness/`) with thin per-runtime adapters. Claude Code is the primary/most-automated runtime (agent teams via the `Agent` tool); Codex is supported via `AGENTS.md` + `.agents/skills/` + native subagents / `codex exec` (invoke with `$myharness` or `/skills`). See `skills/myharness/references/runtime-adapters.md`. Gemini is used as an external review reviewer (via agy), not as a host runtime.
+**A.** No. **Slim by default.** Simple/non-code/reversible work uses internal QA only; standard code/design gets one external review pass; only contract changes and irreversible critical work get external review at every stage plus an approval ladder. Risk tiers tune the strength (`skills/myharness/references/factory-map.md`).
+</details>
+
+<details>
+<summary><b>Q3. If I update the factory, does it overwrite the harness I customized?</b></summary>
+
+**A.** No. `/myharness update` classifies files by `.harness-manifest.json` hashes and **holds** USER-MODIFIED ones (replaced only with explicit approval, no partial merge). If you separate your own policy into `*.local.*` files, updates stay safe. Details: `skills/myharness/references/harness-update.md`.
 </details>
 
 ## License
