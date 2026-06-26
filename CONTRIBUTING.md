@@ -1,155 +1,105 @@
-# Contributing to Harness
+# Contributing to myharness
 
-Thanks for considering a contribution to **Harness** — a Claude Code meta-skill factory that designs agent teams and generates skills.
+Thanks for considering a contribution to **myharness** — a Claude Code · Codex meta-skill factory that turns a domain sentence into an agent team and the skills they use.
 
-This document covers: response SLAs, how to contribute, development setup, PR conventions, commit message rules, code of conduct, and maintainer list.
+> **Note:** myharness is a **personal fork-factory** maintained by a single maintainer. Response times are **best-effort**, not a contractual SLA. Pinging an open issue/PR after a while is welcome — that's the agreed feedback loop, not rudeness.
 
----
-
-## Response SLA (commitments)
-
-These are the maintainer response targets for this repository. They are **conservative** so that a small maintainer team can realistically keep them while scaling.
-
-| Surface | Target | Notes |
-|---------|--------|-------|
-| PR — 1st response | **< 72h** | Business days. A "1st response" means at minimum a label + one comment acknowledging the PR. |
-| Issue triage & labeling | **< 48h** | Every new issue gets `needs-triage` removed and a type label (`bug` / `enhancement` / `question` / `discussion`) within 48h. |
-| Bug resolve (P0 / P1) | **< 14d** | P0 = data loss / security / broken install. P1 = common path broken. P2/P3 tracked on roadmap without a hard SLA. |
-| Security report | **< 7d** | Initial acknowledgement within 7 days. Patch target 30 days. Please see **Security** section below for the private channel. |
-| Release cadence | **every 2 weeks** | Biweekly tag unless there is nothing shippable. P0 fixes may cut an off-schedule patch release. |
-
-If we miss an SLA, please feel free to ping the issue/PR — that is not rude, it is the agreed feedback loop.
+This document covers: how to contribute, development setup, PR conventions, commit message rules, and code of conduct.
 
 ---
 
 ## How to Contribute
 
-Different kinds of contributions go through different entry points. Pick the one that fits.
+Plain GitHub issues and discussions — there are no custom issue forms.
 
 ### Bug report
-
-- Open an issue using the **Bug report** form (`.github/ISSUE_TEMPLATE/bug_report.yml`).
-- Required: Claude Code version, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` flag state, reproduction steps, expected vs actual, OS.
-- Small reproductions (< 30 lines) are ideal. If your repro needs a full project, link a public fork.
+- Open a GitHub issue. Include: Claude Code version, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` flag state, reproduction steps, expected vs actual, OS.
+- Small reproductions (< 30 lines) are ideal. For a full project, link a public fork.
 
 ### Feature request
+- Open an issue with a short "what problem does this solve" paragraph. If you have a proposal, say which of the 6 team-architecture patterns it extends/replaces (Pipeline, Fan-out/Fan-in, Expert Pool, Producer-Reviewer, Supervisor, Hierarchical Delegation).
 
-- Open an issue using the **Feature request** form.
-- We expect a short "what problem does this solve" paragraph. If you have a proposal, put it in the PR-ready shape (which of the 6 team-architecture patterns does it extend / replace?).
-
-### Question
-
-- Open an issue using the **Question** form, **or** start a thread in [GitHub Discussions](https://github.com/cookyman74/my_harness/discussions) if the matter is open-ended.
-
-### Discussion (RFC-sized ideas)
-
-- Prefer GitHub Discussions. Only promote to an issue once there is rough consensus on direction.
-
-### Pull Request
-
-- See **Pull Request Guidelines** below.
-- Small PRs merge faster. Anything > 400 lines of diff should probably have been a Discussion first.
+### Question / Discussion
+- Use [GitHub Discussions](https://github.com/cookyman74/my_harness/discussions) for open-ended matters; promote to an issue once direction is clear.
 
 ### Security
-
 - Do **not** open a public issue for anything that could be abused.
-- Email: `cookyman@gmail.com` with subject prefix `[myharness-security]`.
-- We aim to acknowledge within 7 days (see SLA table).
+- Email `cookyman@gmail.com` with subject prefix `[myharness-security]`. Best-effort acknowledgement; please allow time.
 
 ---
 
 ## Development Setup
 
 ### Prerequisites
+- Claude Code `v2.x` (agent teams via the `Agent` tool — `TeamCreate`/`TeamDelete` were removed in v2.1.178)
+- Codex CLI (optional, for the dual-runtime path)
+- `git`; `codex` / `agy` CLIs optional (external review — skipped if absent)
 
-- Claude Code `v2.x` (Agent Teams API required)
-- Node.js `>= 18` (for local tooling used in CI)
-- Git
-
-### Environment flag
-
-Harness currently requires Claude Code's experimental Agent Teams feature. Set the flag in your shell profile or per-session:
-
+### Agent teams flag (Claude Code)
+myharness's default mode uses Claude Code's experimental agent teams:
 ```bash
 export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
 ```
+Dependency tracked in `docs/experimental-dependency.md` (Scenario A/C realized — `TeamCreate`/`TeamDelete` removed; teammates now spawn via the `Agent` tool).
 
-We track this dependency in `docs/experimental-dependency.md` (if Anthropic promotes the flag to stable, we update the README within 72h per the SLA above).
-
-### Local plugin link
-
-To test your changes in a local Claude Code session without publishing to the marketplace:
-
+### Install for local testing
 ```bash
-# From your checkout
-claude plugin link .
+# Claude Code — via marketplace
+/plugin marketplace add cookyman74/my_harness
+/plugin install myharness@myharness-marketplace
 
-# Verify
-claude plugin list | grep harness
+# or global skill copy
+cp -r skills/myharness ~/.claude/skills/myharness
+
+# Codex (dual runtime) — symlinks the live source of truth
+bash install.sh
 ```
 
-Unlink with `claude plugin unlink harness` when you're done.
-
-### Running the meta-skill
-
+### Run the meta-skill
 ```bash
 claude "build a harness for a fintech risk-assessment team"
+# or:  /myharness   (Codex: $myharness)
 ```
+Scaffolded agents/skills land under `.claude/agents/` and `.claude/skills/` (and `.agents/`, `.codex/` for the dual-runtime output).
 
-Scaffolded agents and skills land under `.claude/agents/` and `.claude/skills/` in the target project.
-
-### Tests & lints
-
-- Markdown lint: `npx markdownlint '**/*.md'`
-- YAML lint (issue templates & workflows): `npx yaml-lint .github/`
-- Skill metadata validation: `python scripts/validate_skills.py` (if present)
-
-CI runs these on every PR. Local execution is encouraged but not required — we won't block on CI-caught issues that are trivial to fix on merge.
+### Checks (factory-repo self-audit)
+```bash
+bash skills/myharness/scripts/run-policy-audit.sh   # link/version/cap/dual-runtime parity (fail=block, warn=review)
+bash .claude/skills/release-flow/scripts/check-version.sh   # version consistency
+bash skills/myharness/scripts/check-review-tools.sh         # external reviewer availability (runner-excluded)
+```
 
 ---
 
 ## Pull Request Guidelines
 
-### Branch naming
-
-Use the `type/short-description` shape:
-
+### Branch naming — `type/short-description`
 | Prefix | Use for | Example |
 |--------|---------|---------|
 | `feat/` | New user-visible capability | `feat/expert-pool-variance-mode` |
 | `fix/` | Bug fix | `fix/agent-teams-flag-detection` |
-| `docs/` | Docs-only changes | `docs/quickstart-gemini-section` |
+| `docs/` | Docs-only changes | `docs/quickstart-agy-section` |
 | `refactor/` | Internal structure, no behavior change | `refactor/skill-loader-split` |
-| `chore/` | Build, deps, housekeeping | `chore/upgrade-markdownlint` |
+| `chore/` | Build, deps, housekeeping | `chore/release-1.3.0` |
 | `test/` | Tests only | `test/fan-out-fan-in-e2e` |
 
+### Before opening a PR
+- Run `run-policy-audit.sh` (PASS, fail 0) and `check-version.sh` (version consistency).
+- Keep `SKILL.md` ≤ 500 lines (Progressive Disclosure — move detail to `references/`).
+- Dual-runtime: factory canonical lives at `skills/myharness/`; `.agents/skills/myharness` is a symlink (auto-synced).
+
 ### Commit message language
+- **Korean and English both accepted.** Write in whichever you're more precise in.
+- If the change hits the CHANGELOG/release notes, also give an English title in the PR description.
 
-- **Korean and English are both accepted.** Write in whichever you are more precise in.
-- If the change will appear in the CHANGELOG or release notes, please also provide an English title in the PR description so downstream readers can follow.
-
-### PR template
-
-Every PR body is pre-filled from `.github/PULL_REQUEST_TEMPLATE.md`. Please fill in:
-
-- **Summary** (what & why, 2–4 sentences)
-- **Motivation** (link issue, reference research, or 1-line rationale)
-- **Scope of change** (checklist of touched surfaces)
-- **Tests** (what you ran / added)
-- **CHANGELOG** (did you update `CHANGELOG.md`? Y/N/NA)
-- **SemVer impact** (patch / minor / major — see next section)
-
-### Review expectation
-
-- One approving review from a maintainer is required.
-- We try to respond on PRs within 72h (see SLA). If you're blocked, ping.
+### Review
+- Maintainer review before merge. Best-effort turnaround — ping if blocked.
 
 ---
 
 ## Commit Message Convention
 
-We follow a light variant of **Conventional Commits** that maps directly to SemVer.
-
+A light variant of **Conventional Commits** mapped to SemVer.
 ```
 <type>(<scope>)!: <short summary>
 
@@ -158,54 +108,44 @@ We follow a light variant of **Conventional Commits** that maps directly to SemV
 <footer — optional>
 ```
 
-### Types & SemVer mapping
-
 | Commit type | SemVer impact | Example |
 |-------------|---------------|---------|
-| `feat!:` or `BREAKING CHANGE:` in footer | **major** (e.g. 1.x → 2.0) | `feat!: rename primary pattern "Supervisor" → "Orchestrator"` |
-| `feat:` | **minor** (e.g. 1.2 → 1.3) | `feat: add Producer-Reviewer variance metric` |
-| `fix:` | **patch** (e.g. 1.2.3 → 1.2.4) | `fix: correct flag detection on zsh` |
-| `docs:` / `chore:` / `refactor:` / `test:` | no release bump | `docs: clarify Gemini roadmap` |
+| `feat!:` or `BREAKING CHANGE:` footer | **major** (1.x → 2.0) | `feat!: rename pattern "Supervisor" → "Orchestrator"` |
+| `feat:` | **minor** (1.2 → 1.3) | `feat: add document-system tiering` |
+| `fix:` | **patch** (1.2.3 → 1.2.4) | `fix: correct flag detection on zsh` |
+| `docs:` / `chore:` / `refactor:` / `test:` | no bump | `docs: clarify dual-runtime adapters` |
 
 - Korean summaries are fine: `feat: 전문가 풀 패턴에 분산 지표 추가`.
-- The `!` suffix (or `BREAKING CHANGE:` footer) is the **only** canonical major-version trigger. Please do not set it lightly.
+- The `!` suffix (or `BREAKING CHANGE:` footer) is the **only** major-version trigger — don't set it lightly.
 
-### Release tagging
-
-- Releases are cut every 2 weeks (see SLA).
-- Tagging happens from `main` after CI passes and CHANGELOG is updated.
-- Tags follow `vMAJOR.MINOR.PATCH` (e.g. `v1.3.0`).
+### Releases
+- Cut ad-hoc as features land (no fixed cadence), via the `release-flow` skill: CHANGELOG promote + `plugin.json`/`marketplace.json`/README badges sync + `git tag vMAJOR.MINOR.PATCH` from `main`.
 
 ---
 
 ## Code of Conduct
 
-This project adheres to the **Contributor Covenant v1.4** — in short:
-
-- Be welcoming and inclusive. Assume good intent.
-- No harassment, no personal attacks, no discriminatory language.
-- Critique ideas, not people. Back claims with references where possible.
-- Maintainers may moderate, edit, or remove comments/commits/issues/PRs that violate these principles, and may ban offenders.
+This project follows the **Contributor Covenant v1.4**:
+- Be welcoming and inclusive; assume good intent.
+- No harassment, personal attacks, or discriminatory language.
+- Critique ideas, not people; back claims with references where possible.
+- The maintainer may moderate or remove content that violates these principles.
 
 Full text: <https://www.contributor-covenant.org/version/1/4/code-of-conduct/>
-
-Report Code of Conduct violations privately to `cookyman@gmail.com` with subject prefix `[myharness-coc]`.
+Report violations privately to `cookyman@gmail.com` with subject prefix `[myharness-coc]`.
 
 ---
 
-## Maintainers
+## Maintainer
 
 | Role | Handle | Area |
 |------|--------|------|
-| Lead maintainer | [@cookyman74](https://github.com/cookyman74) | Project direction, releases, final review |
-| Contributor | [@hnts03](https://github.com/hnts03) | Skill templates, Korean documentation |
-| Contributor | [@JunghwanNA](https://github.com/JunghwanNA) | Agent patterns, integration tests |
-| Contributor | [@shaun0927](https://github.com/shaun0927) | Tooling, CI, infra |
+| Maintainer | [@cookyman74](https://github.com/cookyman74) | Direction, releases, review — everything |
 
-New contributors become listed here after sustained contribution (not a single PR). Drop a note in a Discussion if you'd like to discuss a maintainer path.
+Sustained contributors may be added here. Open a Discussion if you'd like to talk about a maintainer path.
 
 ---
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the same license as this repository (see [`LICENSE`](./LICENSE)).
+By contributing, you agree your contributions are licensed under the same license as this repository (see [`LICENSE`](./LICENSE)).
