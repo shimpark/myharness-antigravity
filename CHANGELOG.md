@@ -4,6 +4,13 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-26
+
+### Added
+
+- **R2-D2 정렬 D1+D3 (테스트=1급 리뷰 산출물 · 안전 롤백 규율)** — 외부 사용자 R2-D2 방법론 제안을 외부감사 2회(codex×2+agy×2, 23건) 검증 후 확정 가치만 반영. **D1:** RED 테스트를 1급 리뷰 산출물로 승격 — GREEN 전 self-reflection+정적검사로 1차 검증, 계약·스키마·마이그레이션·보안·다도메인 테스트만 외부 교차리뷰(내부 단위·mock·UI 과적용 금지). **D3:** `tdd-doctrine.md`에 비파괴 롤백 규율 신설 — 파괴적 `git reset --hard` 폐기, checkpoint+`git restore` scoped 복구+untracked는 `.staging_backup/` 보존, 오케스트레이터 전용·명시 승인. (D2 산출물 staging은 감사 지적(비용폭증·슬림위반)으로 opt-in·dynamic 재설계 후 보류 — `_workspace/design/r2d2-staging-proposal-v2.md`.) 대상: `references/{external-review-loop,tdd-doctrine}.md`.
+- **D4 문서 체계 코어 (docs/ 영속 ↔ _workspace/ 휘발 2층 분리)** — 외부감사 **3회**(codex×3+agy×3, 누적 ~40건)가 원안(풀 docs 강제)을 안전한 최소 코어로 수렴. 결과서가 `_workspace/` gitignore로 휘발하던 갭(G-DUR) 해소: 영속 산출물(설계서·계획서·결과서)은 `docs/{project}/`(커밋·감사 원장), 휘발물은 `_workspace/`. 문서 티어(T0 `_workspace`만/Tμ commit digest/T1 결과서 1장), 기본 경량·리스크 등급과 독립축(중대→최소 T1). promote=git staging(커스텀 mv 폐기), 실패=fail-fast(동적 격상 폐기), RAG=최신 결과서 1개(이중상태 폐기). **외부 리뷰 도구와 무관 — codex/agy 없는 사용자도 그대로 작동(내부 QA로 게이트).** 감사가 미검증 발명(병렬 merge·promote mv·manifest 이중상태·동적 격상)을 보류시킴(T2 2단계=설계 승인·미구현). 신규 `references/templates/working-history-skeleton.md` + `SKILL.md` 5-1·`orchestrator-template.md`·`factory-map.md` 보강. 설계 이력: `_workspace/design/d4-doc-management-FINAL-core.md`.
+
 ## [1.1.1] - 2026-06-21
 
 ### Fixed
