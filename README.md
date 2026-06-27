@@ -181,7 +181,7 @@ and produces a comprehensive report.
 **Full-stack web development**
 ```
 Build a harness for full-stack web development. I'd like a team where design · frontend
-(React/Next.js) · backend (API) · QA collaborate as a pipeline from wireframe to deployment.
+(Vue.js 3 with CDN) · backend (ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture) · QA collaborate as a pipeline from wireframe to deployment.
 ```
 
 **Webtoon production**
