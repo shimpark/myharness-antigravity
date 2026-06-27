@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/Version-1.2.0-brightgreen.svg" alt="Version">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache_2.0-blue.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/Claude_Code-Plugin-purple.svg" alt="Claude Code Plugin">
-  <img src="https://img.shields.io/badge/Runtime-Claude_Code_+_Codex-blueviolet.svg" alt="Dual Runtime">
+  <img src="https://img.shields.io/badge/Runtime-Claude_Code_+_Codex_+_Antigravity-blueviolet.svg" alt="Triple Runtime">
   <img src="https://img.shields.io/badge/Patterns-6_Architectures-orange.svg" alt="6 Architecture Patterns">
   <img src="https://img.shields.io/badge/Quality_Gate-2--Layer-green.svg" alt="Two-Layer Quality Gate">
   <a href="https://github.com/cookyman74/my_harness/stargazers"><img src="https://img.shields.io/github/stars/cookyman74/my_harness?style=social" alt="GitHub Stars"></a>
@@ -16,8 +16,8 @@
 
 **English** | [한국어](README_KO.md) | [日本語](README_JA.md)
 
-> **myharness is a Claude Code · Codex dual-runtime factory that turns a single sentence about your domain into an agent team and skills.**
-> Just say `"Build a harness for this project"` — it analyzes your domain and stamps out specialized agent definitions (`.claude/agents/`) and skills (`.claude/skills/`), picking whichever of the 6 team architecture patterns fits.
+> **myharness is a Claude Code · Codex · Antigravity triple-runtime factory that turns a single sentence about your domain into an agent team and skills.**
+> Just say `"Build a harness for this project"` — it analyzes your domain and stamps out specialized agent definitions (`.claude/agents/` / `.agents/agents/`) and skills (`.claude/skills/` / `.agents/skills/`), picking whichever of the 6 team architecture patterns fits.
 
 ---
 
@@ -27,7 +27,7 @@ When you tackle a complex job with one giant prompt, context gets polluted, the 
 
 - **Input:** a single sentence about your domain (e.g., "deep research", "full-stack web development", "code review")
 - **Output:** agent definitions + skills + an orchestrator skill + entry pointers (`CLAUDE.md`/`AGENTS.md`)
-- **Characteristics:** Korean-first · slim by default (gates tighten only as risk rises) · outputs for both Claude Code and Codex
+- **Characteristics:** Korean-first · slim by default (gates tighten only as risk rises) · outputs for Claude Code, Codex, and Antigravity
 
 myharness itself is a meta skill (plugin), and it treats itself as **a system that evolves** — it feeds execution feedback back into the appropriate layer (skill/agent/orchestrator) and leaves a change history.
 
@@ -76,7 +76,7 @@ claude   # start the Claude Code CLI (for Codex, use the codex command)
 | **Two-layer quality gate** | Internal generate-and-verify QA **+** an external independent review loop. Details below |
 | **Doctrine injection** | Injects TDD (`tdd-doctrine.md`) and dev rules (`dev-rules.md`) into the working principles of coding/editing agents via **real paths**. Includes **test-as-first-class-review-artifact** (RED verified before GREEN; only contract/schema/security tests go to external cross-review) and a **safe rollback discipline** (destructive `git reset --hard` dropped). Risk tiers (light/standard/critical) tune gate strength |
 | **Document system** | Core artifacts (design docs, work plans, work results) live in `docs/{project}/` (durable, committed audit ledger); scratch lives in `_workspace/` (ephemeral) — two-layer split prevents result-doc loss (RAG knowledge cycle). Document tiers (light by default), git-staging promote, fail-fast. Independent of external review tools (internal QA if none) |
-| **Dual runtime** | A single source of truth (`skills/myharness/`) + a thin per-runtime adapter. Outputs both `CLAUDE.md` and `AGENTS.md`, with orchestration branching (Claude spawns `Agent` teammates ↔ Codex native subagents / `codex exec`). Phase 7 synchronization prevents drift |
+| **Triple runtime** | A single source of truth (`skills/myharness/`) + a thin per-runtime adapter. Outputs `CLAUDE.md`, `AGENTS.md`, and `skills.json` simultaneously, with orchestration branching (Claude spawns `Agent` teammates ↔ Codex native subagents ↔ Antigravity Powershell async). Phase 7 synchronization prevents drift |
 | **Built-harness update** | `/myharness update` (Codex `$myharness update`) — re-propagates the factory source of truth into an already-built harness while **protecting local edits**. `.harness-manifest.json` hash classification (SAME/auto/USER-MODIFIED held/NEW), with `*.local.*` keeping updates safe |
 | **Cost & concurrency control** | Model routing (high-reasoning → `opus`, simple → lightweight), a concurrency cap (default 3 / max 5) with backpressure, an external-review budget (skips when there's no change), and smoke/full test modes to keep large fan-out costs under control |
 | **Loop self-evaluation** | Each loop produces a `loop_scorecard.json` (alignment · verdict distribution · normalization rounds · cost). **Currently only the measurement logging is active**; the suggest → automatic loopback is experimental. anti-Goodhart guards (against metric gaming and overfitting) |
@@ -85,7 +85,7 @@ claude   # start the Claude Code CLI (for Codex, use the codex command)
 
 Internal QA runs in the same session and the same context, so it shares the **same blind spots**. That's why an external independent AI review is placed on a separate axis.
 
-- **Engine diversity** — reviewers are chosen by **excluding** the runner engine (same engine = same blind spots). When running on Claude Code, `codex`+`agy`; when running on Codex, `claude`+`agy`. (`agy` = a Gemini model)
+- **Engine diversity** — reviewers are chosen by **excluding** the runner engine (same engine = same blind spots). When running on Claude Code, `codex`+`agy`; when running on Codex, `claude`+`agy`; when running on Antigravity, `claude`+`codex`. (`agy` = a Gemini model)
 - **Direct verdict on every item** — external reviewers don't know the design decisions, frozen contracts, or actual measurements, so the orchestrator judges every reported issue against **the real code** as confirmed/partial/deferred/rejected. Consensus is not the answer; verdict authority stays with the orchestrator (no delegation).
 - **Convergence loop** — loop-until-dry (zero new issues for K consecutive rounds) + a round cap, a verdict ledger (`verdicts.json`, prevents reappearance), and re-review of the fix. Only confirmed items are fixed via TDD.
 - **Skip when tools are absent** — `check-review-tools.sh` produces a runner-excluded `REVIEWERS:` list; if no external reviewer exists, the gate shrinks to internal QA (avoids a non-functional skill).
@@ -127,9 +127,7 @@ Phase 7  Harness evolution (feedback loopback · runtime synchronization · buil
 | **Sub-agents** | Direct `Agent` tool calls (`run_in_background` for parallelism) | One-off work, no inter-agent communication needed |
 | **Hybrid** | Mix team/sub per phase | When phases have different characteristics |
 
-<p align="center">
-  <img src="harness_team.png" alt="myharness Agent Team" width="500">
-</p>
+---
 
 | Architecture pattern | Description |
 |----------------------|-------------|
@@ -144,32 +142,41 @@ Phase 7  Harness evolution (feedback loopback · runtime synchronization · buil
 
 ```
 your-project/
+├── .agents/
+│   ├── agents/          # agent markdown definitions (ui-developer.md, a11y-reviewer.md …)
+│   ├── skills/          # skills (each SKILL.md + references/)
+│   └── skills.json      # Antigravity skills manifest
 ├── .claude/
-│   ├── agents/          # agent definitions (analyst.md, builder.md, qa.md …)
-│   └── skills/          # skills (each SKILL.md + references/)
+│   ├── agents/          # Claude Code agent definitions
+│   └── skills/          # Claude Code skill definitions
+├── .codex/
+│   └── agents/          # Codex TOML agent definitions
 ├── CLAUDE.md            # Claude Code entry pointer
-└── AGENTS.md            # Codex entry pointer (when dual runtime)
+└── AGENTS.md            # Codex / Antigravity entry pointer
 ```
 
-> **Dual-runtime output:** If Codex is also a target, `.agents/skills/<name>/` and `.codex/agents/<name>.toml` are emitted alongside the `.claude/` output (same source of truth). Details: `skills/myharness/references/runtime-adapters.md`.
+> **Triple-runtime output:** Emits and synchronizes Antigravity (`.agents/`), Claude (`.claude/`), and Codex (`.codex/`) compatible formats simultaneously. Details: `skills/myharness/references/runtime-adapters.md`.
 
-## Dual Runtime (Claude Code + Codex)
+## Triple Runtime (Claude Code + Codex + Antigravity)
 
 The source of truth (skill body · references · scripts) is **runtime-agnostic Markdown**. Only the adapter branching differs:
 
-| Concern | Claude Code | Codex CLI |
-|---------|-------------|-----------|
-| Entry point | `.claude-plugin/plugin.json` + `CLAUDE.md` | `AGENTS.md` (auto-loaded) |
-| Skills | `.claude/skills/` | `.agents/skills/` (same format) |
-| Agents | `.claude/agents/*.md` | `.codex/agents/*.toml` + built-in worker/explorer |
-| Orchestration | `Agent` teammate spawn + `SendMessage` + `TaskCreate` | native subagents / `codex exec` subprocess |
-| External reviewers | codex + agy (runner claude excluded) | claude + agy (runner codex excluded) |
+| Concern | Claude Code | Codex CLI | Antigravity (Gemini) |
+|---------|-------------|-----------|----------------------|
+| Entry point | `.claude-plugin/plugin.json` + `CLAUDE.md` | `AGENTS.md` (auto-loaded) | `AGENTS.md` + `.agents/skills.json` |
+| Skills | `.claude/skills/` | `.agents/skills/` | `.agents/skills/` |
+| Agents | `.claude/agents/*.md` | `.codex/agents/*.toml` | `.agents/agents/*.md` or `.claude/agents/*.md` |
+| Orchestration | `Agent` teammate spawn + `SendMessage` + `TaskCreate` | native subagents / `codex exec` | Powershell async + `manage_task` + `browser_subagent` |
+| External reviewers | codex + agy (runner claude excluded) | claude + agy (runner codex excluded) | claude + codex (runner agy excluded) |
 
-> `agy` (antigravity, a Gemini model) is not a host runtime — it's dedicated to external review only. Details: `skills/myharness/references/runtime-adapters.md`.
+> When `agy` (antigravity, a Gemini model) acts as the host runtime, the external reviewers are `claude+codex`. Details: `skills/myharness/references/runtime-adapters.md`.
 
 ## Example Prompts
 
-After install, paste these straight into Claude Code (or Codex):
+After install, paste these straight into Claude Code, Codex, or the Antigravity IDE:
+
+> **💡 Antigravity IDE (Windows) Tip:**
+> When running a harness for UI development or web components, request the orchestrator to integrate browser-testing skills utilizing the `browser_subagent` tool for automated visual and accessibility validation.
 
 **Deep research**
 ```
@@ -259,7 +266,7 @@ myharness lives at the **meta-factory** layer of the Claude Code agent ecosystem
 <details>
 <summary><b>Q1. Which runtimes are supported?</b></summary>
 
-**A.** Both Claude Code and Codex (dual runtime). A single source of truth (`skills/myharness/`) + a thin per-runtime adapter. Claude Code is the most automated primary runtime (`Agent` teammate spawn); Codex is supported via `AGENTS.md` + `.agents/skills/` + native subagents / `codex exec` (`$myharness` or `/skills`). Gemini is not a host — it's used only as an external reviewer (via agy). Details: `skills/myharness/references/runtime-adapters.md`.
+**A.** It supports Claude Code, Codex, and Antigravity (Gemini CLI) all three runtimes. It maintains a single source of truth in Markdown (`skills/myharness/`) and branches into runtime adapters on execution. In the Antigravity IDE, it loads via `AGENTS.md` + `.agents/skills.json` and runs via Powershell async background tasks coupled with `browser_subagent`. Details: `skills/myharness/references/runtime-adapters.md`.
 </details>
 
 <details>
