@@ -283,7 +283,7 @@ footer .links{display:flex;gap:2rem;justify-content:center;margin-bottom:1rem}
         <p class="uc-short" data-i18n="usecases.website.short">Full-stack build pipeline</p>
         <div class="uc-detail">
           <div class="uc-pattern"><span class="uc-badge">Pipeline</span></div>
-          <div class="uc-prompt" onclick="event.stopPropagation();copyPrompt(this)" data-i18n-prompt="usecases.website.prompt">Build a harness for full-stack website development. The team should handle design, frontend (React/Next.js), backend (API), and QA testing in a coordinated pipeline from wireframe to deployment.<span class="uc-copy-hint" data-i18n="common.click_to_copy">Click to copy</span></div>
+          <div class="uc-prompt" onclick="event.stopPropagation();copyPrompt(this)" data-i18n-prompt="usecases.website.prompt">Build a harness for full-stack website development. The team should handle design, frontend (Vue.js 3 with CDN), backend (ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture), and QA testing in a coordinated pipeline from wireframe to deployment.<span class="uc-copy-hint" data-i18n="common.click_to_copy">Click to copy</span></div>
         </div>
       </div>
       <div class="usecase-card" data-active="false">
@@ -684,9 +684,9 @@ const i18n = {
     "ja": "\u30d5\u30eb\u30b9\u30bf\u30c3\u30af\u30d3\u30eb\u30c9\u30d1\u30a4\u30d7\u30e9\u30a4\u30f3"
   },
   "usecases.website.prompt": {
-    "en": "Build a harness for full-stack website development. The team should handle design, frontend (React/Next.js), backend (API), and QA testing in a coordinated pipeline from wireframe to deployment.",
-    "ko": "\ud480\uc2a4\ud0dd \uc6f9\uc0ac\uc774\ud2b8 \uac1c\ubc1c \ud558\ub124\uc2a4\ub97c \uad6c\uc131\ud574\uc918. \ub514\uc790\uc778, \ud504\ub860\ud2b8\uc5d4\ub4dc(React/Next.js), \ubc31\uc5d4\ub4dc(API), QA \ud14c\uc2a4\ud2b8\ub97c \uc640\uc774\uc5b4\ud504\ub808\uc784\ubd80\ud130 \ubc30\ud3ec\uae4c\uc9c0 \ud30c\uc774\ud504\ub77c\uc778\uc73c\ub85c \uc870\uc728\ud558\ub294 \ud300.",
-    "ja": "\u30d5\u30eb\u30b9\u30bf\u30c3\u30afWeb\u30b5\u30a4\u30c8\u958b\u767a\u306e\u30cf\u30fc\u30cd\u30b9\u3092\u69cb\u6210\u3057\u3066\u3002\u30c7\u30b6\u30a4\u30f3\u3001\u30d5\u30ed\u30f3\u30c8\u30a8\u30f3\u30c9\uff08React/Next.js\uff09\u3001\u30d0\u30c3\u30af\u30a8\u30f3\u30c9\uff08API\uff09\u3001QA\u30c6\u30b9\u30c8\u3092\u30ef\u30a4\u30e4\u30fc\u30d5\u30ec\u30fc\u30e0\u304b\u3089\u30c7\u30d7\u30ed\u30a4\u307e\u3067\u30d1\u30a4\u30d7\u30e9\u30a4\u30f3\u3067\u8abf\u6574\u3059\u308b\u30c1\u30fc\u30e0\u3002"
+    "en": "Build a harness for full-stack website development. The team should handle design, frontend (Vue.js 3 with CDN), backend (ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture), and QA testing in a coordinated pipeline from wireframe to deployment.",
+    "ko": "\ud480\uc2a4\ud0dd \uc6f9\uc0ac\uc774\ud2b8 \uac1c\ubc1c \ud558\ub124\uc2a4\ub97c \uad6c\uc131\ud574\uc918. \ub514\uc790\uc778, \ud504\ub860\ud2b8\uc5d4\ub4dc(Vue.js 3 with CDN), \ubc31\uc5d4\ub4dc(ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture), QA \ud14c\uc2a4\ud2b8\ub97c \uc640\uc774\uc5b4\ud504\ub808\uc784\ubd80\ud130 \ubc30\ud3ec\uae4c\uc9c0 \ud30c\uc774\ud504\ub77c\uc778\uc73c\ub85c \uc870\uc728\ud558\ub294 \ud300.",
+    "ja": "\u30d5\u30eb\u30b9\u30bf\u30c3\u30afWeb\u30b5\u30a4\u30c8\u958b\u767a\u306e\u30cf\u30fc\u30cd\u30b9\u3092\u69cb\u6210\u3057\u3066\u3002\u30c7\u30b6\u30a4\u30f3\u3001\u30d5\u30ed\u30f3\u30c8\u30a8\u30f3\u30c9\uff08Vue.js 3 with CDN\uff09\u3001\u30d0\u30c3\u30af\u30a8\u30f3\u30c9\uff08ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture\uff09\u3001QA\u30c6\u30b9\u30c8\u3092\u30ef\u30a4\u30e4\u30fc\u30d5\u30ec\u30fc\u30e0\u304b\u3089\u30c7\u30d7\u30ed\u30a4\u307e\u3067\u30d1\u30a4\u30d7\u30e9\u30a4\u30f3\u3067\u8abf\u6574\u3059\u308b\u30c1\u30fc\u30e0\u3002"
   },
   "usecases.webtoon.title": {
     "en": "Webtoon Production",

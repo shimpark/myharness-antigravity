@@ -179,7 +179,7 @@ your-project/
 
 **フルスタック Web 開発**
 ```
-フルスタック Web 開発用のハーネスを作って。デザイン・フロント(React/Next.js)・バックエンド(API)・QA が
+フルスタック Web 開発用のハーネスを作って。デザイン・フロント(Vue.js 3 with CDN)・バックエンド(ASP.NET Core 8 MVC, C#, MSSQL, Dapper - Clean Architecture)・QA が
 ワイヤーフレームからデプロイまでパイプラインで協業するチームがいい。
 ```
 
